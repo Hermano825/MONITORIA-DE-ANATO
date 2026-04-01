@@ -61,6 +61,26 @@
     transition: border-color .2s, box-shadow .2s;
   }
   .search-bar input:focus { border-color: #8b704b; box-shadow: 0 0 0 3px rgba(139, 112, 75, 0.16); }
+  .ghost-btn {
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .ghost-btn:hover { color: var(--text); background: #fff8ea; }
+  .search-meta {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .search-meta strong { color: var(--text); }
   .tabs {
     display: flex;
     flex-wrap: wrap;
@@ -129,6 +149,27 @@
   .expand-all { float: right; font-size: 11px; color: var(--text3); cursor: pointer; padding: 4px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); margin-top: -2px; }
   .expand-all:hover { color: var(--text); }
   .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .helper-line { text-align: center; color: var(--text3); font-size: 11px; margin-top: 8px; }
+
+  .fab-top {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    border: 0;
+    background: #3b2f21;
+    color: #fffaf1;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 120;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+  }
+  .fab-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
   .mode-toggle { display: flex; gap: 6px; margin-top: 10px; }
   .mode-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border2); font-size: 12px; cursor: pointer; background: var(--bg2); color: var(--text2); transition: all .15s; }
@@ -221,6 +262,7 @@
     .q-header { padding: 12px 12px; }
     .q-title { font-size: 13px; }
     .q-body { padding: 12px; }
+    .ghost-btn { padding: 0 10px; }
   }
 </style>
 </head>
@@ -230,6 +272,11 @@
   <p>UNICHRISTUS &amp; UFC · 2015–2026 · Questões organizadas por tema</p>
   <div class="search-bar">
     <input type="text" id="search" placeholder="Buscar questão ou conteúdo..." oninput="filterSearch()">
+    <button class="ghost-btn" type="button" onclick="clearSearch()">Limpar</button>
+  </div>
+  <div class="search-meta">
+    <span id="search-meta-text">Digite para filtrar as questões por tema ou conteúdo.</span>
+    <span id="search-meta-count"></span>
   </div>
   <div class="mode-toggle">
     <button class="mode-btn active" id="btn-gabarito" onclick="setMode('gabarito')">📋 Gabarito</button>
@@ -269,8 +316,11 @@
     <button class="fc-btn yellow" onclick="fcRate('review')">~ Revisar</button>
     <button class="fc-btn green" onclick="fcRate('right')">✓ Acertei</button>
   </div>
+  <div class="helper-line">Atalhos: Espaco/Enter revela · 1 errei · 2 revisar · 3 acertei</div>
   <div id="fc-done" class="fc-done" style="display:none"></div>
 </div>
+
+<button class="fab-top" id="fab-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
 const CATS = [
@@ -1995,6 +2045,7 @@ Lig. transverso do atlas · Lig. alar (par) · Lig. apical do dente · Membrana 
 
 const tabsEl = document.getElementById('tabs');
 const panelsEl = document.getElementById('panels');
+let activeCategory = 0;
 
 CATS.forEach((cat, ci) => {
   const items = QS.filter(q => q.cat === ci);
@@ -2007,6 +2058,8 @@ CATS.forEach((cat, ci) => {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('p' + ci).classList.add('active');
+    activeCategory = ci;
+    localStorage.setItem('anato_active_category', String(ci));
   };
   tabsEl.appendChild(tab);
 
@@ -2016,7 +2069,7 @@ CATS.forEach((cat, ci) => {
 
   const header = document.createElement('div');
   header.className = 'section-title';
-  header.innerHTML = '<span>' + items.length + ' questões</span><span class="expand-all" onclick="expandAll('+ci+')">Expandir todas</span>';
+  header.innerHTML = '<span>' + items.length + ' questões</span><span class="expand-all" id="exp_'+ci+'" onclick="expandAll('+ci+')">Expandir todas</span>';
   panel.appendChild(header);
 
   items.forEach((item, ji) => {
@@ -2044,27 +2097,65 @@ window.toggle = function(gid) {
   body.style.display = open ? 'none' : 'block';
   arrow.style.transform = open ? '' : 'rotate(180deg)';
   card.classList.toggle('open', !open);
+  const catMatch = gid.match(/^c(\d+)q/);
+  if (catMatch) updateExpandLabel(parseInt(catMatch[1]));
 };
 
 window.expandAll = function(ci) {
   const panel = document.getElementById('p' + ci);
-  panel.querySelectorAll('.q-body').forEach(b => b.style.display = 'block');
-  panel.querySelectorAll('.q-arrow').forEach(a => a.style.transform = 'rotate(180deg)');
-  panel.querySelectorAll('.q-card').forEach(c => c.classList.add('open'));
+  const cards = panel.querySelectorAll('.q-card');
+  const allOpen = [...cards].every(c => c.classList.contains('open'));
+  panel.querySelectorAll('.q-body').forEach(b => b.style.display = allOpen ? 'none' : 'block');
+  panel.querySelectorAll('.q-arrow').forEach(a => a.style.transform = allOpen ? '' : 'rotate(180deg)');
+  panel.querySelectorAll('.q-card').forEach(c => c.classList.toggle('open', !allOpen));
+  updateExpandLabel(ci);
 };
+
+function updateExpandLabel(ci) {
+  const panel = document.getElementById('p' + ci);
+  const btn = document.getElementById('exp_' + ci);
+  if (!panel || !btn) return;
+  const cards = panel.querySelectorAll('.q-card');
+  const allOpen = cards.length > 0 && [...cards].every(c => c.classList.contains('open'));
+  btn.textContent = allOpen ? 'Recolher todas' : 'Expandir todas';
+}
+
+function updateSearchMeta(visible, total, query) {
+  const textEl = document.getElementById('search-meta-text');
+  const countEl = document.getElementById('search-meta-count');
+  if (!query) {
+    textEl.textContent = 'Digite para filtrar as questões por tema ou conteúdo.';
+    countEl.textContent = '';
+    return;
+  }
+  textEl.textContent = visible === 0 ? 'Nenhum resultado encontrado para sua busca.' : 'Resultados filtrados em todas as categorias.';
+  countEl.innerHTML = '<strong>' + visible + '</strong> de ' + total;
+}
 
 window.filterSearch = function() {
   const q = document.getElementById('search').value.toLowerCase().trim();
+  const allCards = document.querySelectorAll('.q-card');
   if (!q) {
-    document.querySelectorAll('.q-card').forEach(c => c.style.display = '');
+    allCards.forEach(c => c.style.display = '');
+    updateSearchMeta(allCards.length, allCards.length, '');
     return;
   }
   // Show all panels and search across all
   document.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.q-card').forEach(c => {
+  let visible = 0;
+  allCards.forEach(c => {
     c.style.display = c.dataset.q.includes(q) ? '' : 'none';
+    if (c.style.display !== 'none') visible++;
   });
+  updateSearchMeta(visible, allCards.length, q);
+};
+
+window.clearSearch = function() {
+  const input = document.getElementById('search');
+  input.value = '';
+  filterSearch();
+  input.focus();
 };
 
 window.setMode = function(mode) {
@@ -2081,6 +2172,7 @@ window.setMode = function(mode) {
     fcEl.style.display = 'block';
     btnG.classList.remove('active');
     btnF.classList.add('active');
+    localStorage.setItem('anato_mode', 'flashcard');
     fcInit();
   } else {
     gabEl.style.display = '';
@@ -2089,6 +2181,7 @@ window.setMode = function(mode) {
     fcEl.style.display = 'none';
     btnG.classList.add('active');
     btnF.classList.remove('active');
+    localStorage.setItem('anato_mode', 'gabarito');
   }
 };
 
@@ -2111,6 +2204,9 @@ window.fcInit = function() {
   const catVal = parseInt(document.getElementById('fc-cat-sel').value);
   const shuffle = document.getElementById('fc-shuffle').checked;
   const onlyWrong = document.getElementById('fc-only-wrong').checked;
+  localStorage.setItem('anato_fc_cat', String(catVal));
+  localStorage.setItem('anato_fc_shuffle', shuffle ? '1' : '0');
+  localStorage.setItem('anato_fc_only_wrong', onlyWrong ? '1' : '0');
 
   let pool = catVal === -1 ? QS : QS.filter(q => q.cat === catVal);
   if (onlyWrong) {
@@ -2232,7 +2328,33 @@ document.addEventListener('keydown', function(e) {
     if (e.key === '1') fcRate('wrong');
     if (e.key === '2') fcRate('review');
     if (e.key === '3') fcRate('right');
+    if (e.key === 'ArrowLeft') fcRate('wrong');
+    if (e.key === 'ArrowDown') fcRate('review');
+    if (e.key === 'ArrowRight') fcRate('right');
   }
+});
+
+(function restoreState() {
+  const savedCat = parseInt(localStorage.getItem('anato_active_category') || '0');
+  if (!Number.isNaN(savedCat) && savedCat >= 0 && savedCat < CATS.length) {
+    const tab = document.querySelector('.tab[data-ci="' + savedCat + '"]');
+    if (tab) tab.click();
+  }
+
+  const fcCat = localStorage.getItem('anato_fc_cat');
+  const fcShuffle = localStorage.getItem('anato_fc_shuffle');
+  const fcWrong = localStorage.getItem('anato_fc_only_wrong');
+  if (fcCat !== null) document.getElementById('fc-cat-sel').value = fcCat;
+  if (fcShuffle !== null) document.getElementById('fc-shuffle').checked = fcShuffle === '1';
+  if (fcWrong !== null) document.getElementById('fc-only-wrong').checked = fcWrong === '1';
+
+  const mode = localStorage.getItem('anato_mode') || 'gabarito';
+  if (mode === 'flashcard') setMode('flashcard');
+})();
+
+window.addEventListener('scroll', function() {
+  const fab = document.getElementById('fab-top');
+  fab.classList.toggle('show', window.scrollY > 320);
 });
 </script>
 </body>
