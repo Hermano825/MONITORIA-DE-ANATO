@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabarito Monitoria de Anatomia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f5ee;
+    --bg2: #fffdf8;
+    --bg3: #efe6d9;
+    --text: #1d1c1a;
+    --text2: #5c5245;
+    --text3: #8f8373;
+    --border: rgba(103, 87, 66, 0.18);
+    --border2: rgba(103, 87, 66, 0.34);
+    --unc-bg: #f5ebd5;
+    --unc-c: #6b4f17;
+    --ufc-bg: #d9f1ea;
+    --ufc-c: #0a5b4a;
+    --radius: 14px;
+    --shadow: 0 12px 28px rgba(32, 24, 14, 0.08);
+  }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background:
+      radial-gradient(circle at 8% 8%, #fff3d8 0, transparent 26%),
+      radial-gradient(circle at 92% 12%, #d8efe9 0, transparent 28%),
+      linear-gradient(165deg, var(--bg) 0%, var(--bg3) 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    background: color-mix(in srgb, var(--bg2) 86%, #ffffff 14%);
+    backdrop-filter: blur(5px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: clamp(1rem, 2vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: .01em;
+  }
+  header p { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .search-bar { margin-top: 12px; display: flex; gap: 8px; }
+  .search-bar input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .search-bar input:focus { border-color: #8b704b; box-shadow: 0 0 0 3px rgba(139, 112, 75, 0.16); }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 1rem 1.5rem .7rem;
+    background: transparent;
+    position: sticky;
+    top: 92px;
+    z-index: 90;
+  }
+  .tab {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border2);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg2);
+    color: var(--text2);
+    transition: all .18s;
+    white-space: nowrap;
+  }
+  .tab:hover { transform: translateY(-1px); }
+  .tab.active { background: #3b2f21; color: #fffaf1; border-color: #3b2f21; }
+  .tab .cnt { font-size: 10px; opacity: .65; margin-left: 4px; }
+  .panel { display: none; padding: .6rem 1.5rem 3rem; max-width: 1120px; margin: 0 auto; }
+  .panel.active { display: block; }
+  .q-card {
+    background: color-mix(in srgb, var(--bg2) 82%, white 18%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    animation: cardIn .28s ease both;
+  }
+  .q-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .q-header:hover { background: #fff6e8; }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; font-weight: 600; }
+  .b-unc { background: var(--unc-bg); color: var(--unc-c); }
+  .b-ufc { background: var(--ufc-bg); color: var(--ufc-c); }
+  .q-title { font-size: 14px; font-weight: 600; flex: 1; line-height: 1.5; }
+  .q-arrow { font-size: 11px; color: var(--text3); margin-top: 3px; flex-shrink: 0; transition: transform .2s; }
+  .q-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    background: #fffaf3;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.8;
+    font-family: 'Literata', serif;
+  }
+  .q-card.open .q-arrow { transform: rotate(180deg); }
+  .q-card.open .q-body { display: block; }
+  .q-body h4 { font-size: 13px; font-weight: 600; margin: 12px 0 5px; color: var(--text); }
+  .q-body h4:first-child { margin-top: 0; }
+  .q-body ul { padding-left: 18px; margin: 4px 0 8px; }
+  .q-body li { margin-bottom: 4px; }
+  .q-body table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; background: #fff; }
+  .q-body td, .q-body th { padding: 6px 9px; border: 1px solid var(--border); text-align: left; }
+  .q-body th { background: #f4ecde; font-weight: 600; }
+  .q-body .pill { display: inline-block; background: #f4ecde; border-radius: 6px; padding: 2px 8px; font-size: 11px; margin: 2px; border: 1px solid var(--border); }
+  .q-body .alert { background: #fff2d8; border-left: 3px solid #d08f1a; padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: #5c5245; }
+  .no-results { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
+  strong { font-weight: 600; }
+  .expand-all { float: right; font-size: 11px; color: var(--text3); cursor: pointer; padding: 4px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); margin-top: -2px; }
+  .expand-all:hover { color: var(--text); }
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    header { padding: .9rem 1rem; }
+    .tabs { top: 86px; padding: .75rem 1rem .6rem; overflow-x: auto; flex-wrap: nowrap; }
+    .panel { padding: .5rem 1rem 2rem; }
+    .q-header { padding: 12px 12px; }
+    .q-title { font-size: 13px; }
+    .q-body { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 Gabarito — Monitoria de Anatomia</h1>
+  <p>UNICHRISTUS &amp; UFC · 2015–2026 · Questões organizadas por tema</p>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Buscar questão ou conteúdo..." oninput="filterSearch()">
+  </div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<div id="panels"></div>
+
+<script>
+const CATS = [
+  "🧠 Neuroanatomia",
+  "🦷 Cabeça e Pescoço",
+  "🫁 Tórax e Coração",
+  "🫃 Abdome",
+  "🍑 Pelve e Períneo",
+  "💪 Membro Superior",
+  "🦵 Membro Inferior",
+  "🦴 Coluna e Dorso"
+];
+
+const QS = [
+// ── NEUROANATOMIA ──────────────────────────────────────────────
+{cat:0,src:"UNICH 26.1",b:"b-unc",q:"Área septal — onde está o cúneo e sua principal função",a:`
+<h4>Área Septal</h4>
+Localizada na face medial do hemisfério cerebral, abaixo do joelho do corpo caloso (região subcalosa). Inclui o <strong>giro subcaloso</strong> e os <strong>núcleos septais</strong>. Faz parte do sistema límbico e está envolvida em comportamento emocional, prazer e modulação do hipocampo.
+<h4>Cúneo</h4>
+Localizado no <strong>lobo occipital</strong>, na face medial do hemisfério, entre o <strong>sulco parietooccipital</strong> (superior) e o <strong>sulco calcarino</strong> (inferior).
+<h4>Função do Cúneo</h4>
+<ul>
+  <li>Processamento visual do <strong>campo visual inferior contralateral</strong></li>
+  <li>Parte da área visual primária (área 17 de Brodmann)</li>
+  <li>Lesão: <strong>quadrantanopsia inferior contralateral</strong></li>
+</ul>`},
+
+{cat:0,src:"UNICH 26.1",b:"b-unc",q:"Sulco occipitotemporal — explique a área motora primária: localização e lesões",a:`
+<h4>Sulco Occipitotemporal</h4>
+Separa o <strong>giro fusiforme</strong> (occipitotemporal lateral) do <strong>giro parahipocampal</strong>, na face inferior do lobo temporal.
+<h4>Área Motora Primária (M1)</h4>
+<ul>
+  <li>Localização: <strong>giro pré-central</strong> (área 4 de Brodmann), anterior ao sulco central</li>
+  <li>Organização somatotópica — Homúnculo de Penfield (medial → lateral): MMII → tronco → MMSS → face/língua</li>
+</ul>
+<h4>Lesões</h4>
+<table>
+  <tr><th>Tipo</th><th>Manifestação</th></tr>
+  <tr><td>Unilateral</td><td>Hemiplegia/hemiparesia <strong>contralateral espástica</strong> (NMS)</td></tr>
+  <tr><td>Bilateral da área da face</td><td>Disfagia, disartria</td></tr>
+  <tr><td>Área do MMII (lobo paracentral)</td><td>Paraplegia + disfunção vesical</td></tr>
+</table>`},
+
+{cat:0,src:"UFC 24.2",b:"b-ufc",q:"Composição do sistema límbico",a:`
+<h4>Estruturas Corticais</h4>
+<ul>
+  <li>Hipocampo (Corno de Amon — CA1 a CA4)</li>
+  <li>Giro dentado e Subículo</li>
+  <li>Córtex entorrinal</li>
+  <li>Giro parahipocampal</li>
+  <li>Giro do cíngulo (córtex cingulado)</li>
+  <li>Córtex piriforme (lobo piriforme)</li>
+</ul>
+<h4>Estruturas Subcorticais</h4>
+<ul>
+  <li>Amígdala (complexo amigdaloide)</li>
+  <li>Hipotálamo (especialmente corpos mamilares)</li>
+  <li>Tálamo (núcleo anterior)</li>
+  <li>Área septal</li>
+  <li>Núcleo accumbens</li>
+  <li>Fórnice (principal via eferente do hipocampo)</li>
+</ul>
+<h4>Circuito de Papez</h4>
+Hipocampo → Fórnice → Corpos Mamilares → Núcleo Anterior do Tálamo → Giro do Cíngulo → Córtex Entorrinal → Hipocampo`},
+
+{cat:0,src:"UFC 24.2",b:"b-ufc",q:"Irrigação dos núcleos da base e da cápsula interna",a:`
+<h4>Núcleos da Base</h4>
+<table>
+  <tr><th>Estrutura</th><th>Principal irrigação</th></tr>
+  <tr><td>Caudado + Putame (estriado)</td><td>Ramos lenticuloestriados da <strong>A. Cerebral Média</strong></td></tr>
+  <tr><td>Globo pálido</td><td><strong>A. coroideia anterior</strong> (ramo da ACI)</td></tr>
+  <tr><td>Cabeça do caudado (parte)</td><td>A. cerebral anterior + A. recorrente de Heubner</td></tr>
+</table>
+<h4>Cápsula Interna</h4>
+<table>
+  <tr><th>Parte</th><th>Irrigação</th></tr>
+  <tr><td>Braço anterior</td><td>Lenticuloestriadas da ACM + A. recorrente de Heubner (ACA)</td></tr>
+  <tr><td>Joelho</td><td>Lenticuloestriadas da ACM</td></tr>
+  <tr><td>Braço posterior</td><td><strong>A. coroideia anterior</strong> + lenticuloestriadas</td></tr>
+</table>
+<div class="alert">⚠️ A. coroideia anterior é ramo direto da artéria carótida interna (ACI). Sua oclusão causa: hemiplegia + hemianestesia + hemianopsia homônima.</div>`},
+
+{cat:0,src:"UFC 2015",b:"b-ufc",q:"Componentes do sistema límbico",a:`
+<h4>Estruturas Principais</h4>
+<ul>
+  <li><strong>Hipocampo</strong>: memória declarativa</li>
+  <li><strong>Amígdala</strong>: emoções, medo, respostas afetivas</li>
+  <li><strong>Giro do cíngulo</strong>: atenção, dor emocional</li>
+  <li><strong>Giro parahipocampal + córtex entorrinal</strong>: porta de entrada do hipocampo</li>
+  <li><strong>Corpos mamilares</strong>: memória (lesão = síndrome de Korsakoff)</li>
+  <li><strong>Núcleo anterior do tálamo</strong>: integrante do circuito de Papez</li>
+  <li><strong>Área septal</strong>: prazer, modulação hipocampal</li>
+  <li><strong>Fórnice</strong>: trato eferente principal</li>
+  <li><strong>Núcleo accumbens</strong>: recompensa e motivação</li>
+</ul>
+<h4>Circuito de Papez (mais cobrado)</h4>
+Hipocampo → Fórnice → Corpos Mamilares → Núcleo Anterior do Tálamo → Giro do Cíngulo → Córtex Entorrinal → Hipocampo`},
+
+{cat:0,src:"UNICH 23.1",b:"b-unc",q:"Núcleo rubro — localização e função",a:`
+<h4>Localização</h4>
+<ul>
+  <li>Tegmento mesencefálico, ao nível do <strong>colículo superior</strong></li>
+  <li>Medialmente à substância negra</li>
+  <li>Coloração rosada pelo depósito de ferro (daí o nome "rubro")</li>
+</ul>
+<h4>Função</h4>
+<ul>
+  <li>Coordenação motora, especialmente de <strong>membros superiores distais</strong></li>
+  <li>Recebe aferências do <strong>cerebelo</strong> (via pedúnculo cerebelar superior — trato dentatorrúbrico) e do córtex motor</li>
+  <li>Emite o <strong>trato rubroespinal</strong> (cruza na decussação tegmentar ventral de Forel)</li>
+  <li>Regula tônus muscular e movimentos voluntários finos</li>
+</ul>`},
+
+{cat:0,src:"UNICH 23.1",b:"b-unc",q:"Comissura do fórnice — para onde se dirige e função",a:`
+<h4>Anatomia</h4>
+O fórnice é a principal via eferente do hipocampo. A <strong>comissura do fórnice</strong> (comissura hipocampal) é a porção transversal que une os dois pilares (cruras) do fórnice, conectando os hipocampos dos dois hemisférios.
+<h4>Trajeto do Fórnice</h4>
+Hipocampo → Cruras (pilares posteriores) → Corpo do fórnice → Colunas (pilares anteriores) → Corpos mamilares do hipotálamo
+<h4>Função</h4>
+<ul>
+  <li>Transmissão de informações hipocampais aos <strong>corpos mamilares</strong> (hipotálamo)</li>
+  <li>Integra o <strong>circuito de Papez</strong></li>
+  <li>Essencial para memória episódica e orientação espacial</li>
+  <li>A comissura em si conecta hipocampos bilateralmente</li>
+</ul>`},
+
+{cat:0,src:"UNICH 23.1",b:"b-unc",q:"Artéria cerebral média — territórios e lesão",a:`
+<h4>Origem e Trajeto</h4>
+Ramo terminal da <strong>artéria carótida interna</strong>. Percorre o sulco lateral (fissura de Sylvius).
+<h4>Territórios</h4>
+<ul>
+  <li>Córtex frontal lateral, parietal lateral, temporal lateral</li>
+  <li>Ínsula</li>
+  <li>Área de Broca (giro frontal inferior — hemisf. dominante)</li>
+  <li>Área de Wernicke (giro temporal superior — hemisf. dominante)</li>
+  <li>Ramos perfurantes (lenticuloestriados) → núcleos da base, cápsula interna</li>
+</ul>
+<h4>Síndrome da ACM</h4>
+<table>
+  <tr><th>Déficit</th><th>Explicação</th></tr>
+  <tr><td>Hemiplegia contralateral</td><td>Predomínio em face e MS (homúnculo)</td></tr>
+  <tr><td>Hemianestesia contralateral</td><td>Córtex parietal</td></tr>
+  <tr><td>Hemianopsia homônima</td><td>Radiações ópticas</td></tr>
+  <tr><td>Afasia de Broca</td><td>Lesão do giro frontal inferior esq.</td></tr>
+  <tr><td>Afasia de Wernicke</td><td>Lesão do giro temporal superior esq.</td></tr>
+  <tr><td>Negligência contralateral</td><td>Hemisf. não dominante</td></tr>
+</table>`},
+
+{cat:0,src:"UNICH 23.2",b:"b-unc",q:"Hipocampo — estrutura e função",a:`
+<h4>Localização</h4>
+Face medial do lobo temporal, no assoalho do <strong>corno inferior do ventrículo lateral</strong>.
+<h4>Estrutura</h4>
+<ul>
+  <li>Formação hipocampal = Hipocampo (CA1–CA4) + Giro dentado + Subículo</li>
+  <li>Arquitetura trilaminar (arquicórtex — mais primitivo)</li>
+  <li>CA1 é a região mais vulnerável à isquemia (<strong>zona de Sommer</strong>)</li>
+</ul>
+<h4>Função</h4>
+<ul>
+  <li>Formação de <strong>memória declarativa</strong> (explícita): episódica e semântica</li>
+  <li>Consolidação de memórias de curto para longo prazo</li>
+  <li>Navegação espacial (células de lugar)</li>
+</ul>
+<h4>Lesão Bilateral</h4>
+<strong>Amnésia anterógrada grave</strong> — incapacidade de formar novas memórias (ex: caso H.M., encefalite herpética, Alzheimer).`},
+
+{cat:0,src:"UNICH 23.2",b:"b-unc",q:"Composição do sistema nervoso periférico",a:`
+<h4>Componentes</h4>
+<ul>
+  <li><strong>Nervos espinhais</strong>: 31 pares (8C, 12T, 5L, 5S, 1Co) — cada um com raiz dorsal (sensitiva) e ventral (motora)</li>
+  <li><strong>Nervos cranianos</strong>: 12 pares (NC I a XII)</li>
+  <li><strong>Gânglios sensitivos</strong>: gânglio da raiz dorsal (espinhal) e gânglios cranianos (trigeminal, geniculado, etc.)</li>
+  <li><strong>Gânglios autonômicos</strong>: simpáticos paravertebrais (tronco simpático) e pré-vertebrais (celíaco, mesentérico); parassimpáticos terminais/intramurais</li>
+  <li><strong>Plexos nervosos</strong>: cervical, braquial, lombossacral</li>
+  <li><strong>Terminações nervosas</strong>: sensitivas e motoras (junções neuromusculares)</li>
+</ul>
+<h4>Componentes Funcionais</h4>
+ASG (aferente somático geral) · ASE · ESG (eferente somático geral) · AVG · AVE · EVG · EVE`},
+
+{cat:0,src:"UNICH 24.1",b:"b-unc",q:"Pilar do fórnice — função",a:`
+<h4>Anatomia</h4>
+Os <strong>pilares (colunas) do fórnice</strong> são as porções anteriores que emergem do corpo do fórnice, mergulham anteriores ao <strong>forame interventricular de Monro</strong> e atingem os <strong>corpos mamilares</strong> do hipotálamo.
+<h4>Função</h4>
+<ul>
+  <li>Transmitir sinais do hipocampo aos corpos mamilares</li>
+  <li>Conectar estruturas do <strong>circuito de Papez</strong></li>
+  <li>Essencial para a memória episódica e orientação espacial</li>
+  <li>Os pilares delimitam o forame interventricular lateralmente</li>
+</ul>`},
+
+{cat:0,src:"UNICH 24.1",b:"b-unc",q:"Artéria recorrente de Heubner — trajeto e função",a:`
+<h4>Origem</h4>
+Ramo da <strong>artéria cerebral anterior (ACA)</strong>, próximo à artéria comunicante anterior (ACoA). Pode originar da própria ACoA.
+<h4>Trajeto</h4>
+Segue lateralmente, <strong>recorrendo</strong> (voltando) em direção ao espaço perfurado anterior (daí o nome "recorrente").
+<h4>Territórios Irrigados</h4>
+<ul>
+  <li>Cabeça do núcleo caudado</li>
+  <li>Putame anteroinferior</li>
+  <li><strong>Braço anterior da cápsula interna</strong></li>
+  <li>Parte da área septal</li>
+</ul>
+<h4>Lesão</h4>
+Hemiplegia contralateral, disartria, alterações comportamentais/de personalidade.`},
+
+{cat:0,src:"UNICH 24.1",b:"b-unc",q:"Seio sagital superior — função",a:`
+<h4>Localização</h4>
+Ao longo da margem superior da <strong>foice do cérebro</strong>, da crista galli até a protuberância occipital interna (tórcula de Herófilo), onde se une aos seios transversos.
+<h4>Funções</h4>
+<ul>
+  <li><strong>Drenagem venosa</strong> dos hemisférios cerebrais (veias corticais superficiais)</li>
+  <li><strong>Reabsorção do LCR</strong> pelas granulações aracnoídeas (Pacchioni) que fazem protrusão em suas paredes laterais</li>
+  <li>Drena para os seios transversos → seios sigmoides → veias jugulares internas</li>
+</ul>
+<div class="alert">⚠️ Trombose do seio sagital superior: hipertensão intracraniana, papiledema, convulsões.</div>`},
+
+{cat:0,src:"UNICH 25.1",b:"b-unc",q:"Cápsula extrema — localização e função",a:`
+<h4>Localização</h4>
+Fina lâmina de substância branca situada <strong>lateralmente ao claustro</strong>. Sequência lateral→medial:
+<br>Córtex insular → <strong>Cápsula extrema</strong> → Claustro → Cápsula externa → Putame → Cápsula interna
+<h4>Função</h4>
+<ul>
+  <li>Conecta o <strong>córtex insular</strong> a outras áreas corticais</li>
+  <li>Possivelmente envolvida em linguagem e processamento cognitivo</li>
+  <li>Função ainda não completamente estabelecida na literatura</li>
+</ul>`},
+
+{cat:0,src:"UNICH 25.1",b:"b-unc",q:"Parede posterior da cavidade do diencéfalo",a:`
+<h4>Cavidade do Diencéfalo</h4>
+A cavidade do diencéfalo é o <strong>terceiro ventrículo</strong>.
+<h4>Parede Posterior</h4>
+Formada pelo <strong>epitálamo</strong>, que inclui:
+<ul>
+  <li><strong>Comissura posterior (epitálamo)</strong>: localizada acima da abertura do aqueduto cerebral (Sylvius)</li>
+  <li><strong>Glândula pineal (epífise)</strong>: ligada à comissura posterior, secreta melatonina, regula ritmo circadiano</li>
+  <li><strong>Trígono da habenula</strong>: contém os núcleos habenulares, relacionados ao sistema límbico</li>
+</ul>
+A abertura do <strong>aqueduto mesencefálico</strong> está na parede posterior inferior, comunicando o 3º com o 4º ventrículo.`},
+
+{cat:0,src:"UNICH 25.1",b:"b-unc",q:"Paralisia facial central x periférica — explicação anatômica",a:`
+<h4>Paralisia Central (Neurônio Motor Superior)</h4>
+Lesão no <strong>córtex motor ou nas fibras corticonucleares</strong>.
+<ul>
+  <li>Acomete apenas o <strong>andar inferior contralateral</strong> (boca, lábio)</li>
+  <li>Poupa o andar superior (fronte, orbicular do olho) pois este tem <strong>inervação bilateral</strong></li>
+  <li>Causas: AVC, tumor, TCE</li>
+</ul>
+<h4>Paralisia Periférica (Neurônio Motor Inferior)</h4>
+Lesão no <strong>núcleo do NC VII (ponte) ou no próprio nervo facial</strong>.
+<ul>
+  <li>Acomete <strong>toda a hemiface ipsilateral</strong> (andar superior + inferior)</li>
+  <li>Pode associar: lacrimejamento, hiperacusia, alteração do paladar (2/3 ant. da língua)</li>
+  <li>Causas: Paralisia de Bell, herpes zóster (Ramsay Hunt), tumor de parótida</li>
+</ul>
+<h4>Regra para lembrar</h4>
+<em>Central → Contralateral inferior | Periférica → Ipsilateral toda a face</em>`},
+
+{cat:0,src:"UNICH 25.1",b:"b-unc",q:"Polar frontal e área olfativa primária",a:`
+<h4>Polo Frontal</h4>
+<ul>
+  <li>Extremidade anterior do lobo frontal (área 10 de Brodmann)</li>
+  <li>Envolvido em funções executivas de alta ordem: memória de trabalho, tomada de decisão, cognição social, prospective memory</li>
+  <li>Uma das regiões de maior expansão evolutiva no H. sapiens</li>
+</ul>
+<h4>Área Olfativa Primária</h4>
+<ul>
+  <li>Localizada no <strong>córtex piriforme</strong>: uncus + giro parahipocampal anterior + córtex entorrinal</li>
+  <li>Paleocórtex (3 camadas — mais primitivo)</li>
+  <li>Recebe projeções diretas do <strong>bulbo olfatório</strong> via trato olfatório</li>
+  <li><strong>Única modalidade sensorial</strong> que não faz sinapse no tálamo antes de chegar ao córtex</li>
+  <li>Lesão (ex: herniação uncal): alucinações olfativas, crises uncinadas</li>
+</ul>`},
+
+// ── CABEÇA E PESCOÇO ─────────────────────────────────────────
+{cat:1,src:"UNICH 26.1",b:"b-unc",q:"Artéria tireoidea superior — limites dos 2 maiores trígonos cervicais e seus subtrígonos",a:`
+<h4>Artéria Tireoidea Superior</h4>
+Primeiro ramo anterior da <strong>artéria carótida externa</strong>. Irriga polo superior da tireoide e emite a <strong>artéria laríngea superior</strong>.
+<h4>Trígono Cervical Anterior</h4>
+<ul>
+  <li>Superior: margem inferior da mandíbula</li>
+  <li>Posterior: borda anterior do ECM</li>
+  <li>Medial: linha mediana do pescoço</li>
+</ul>
+Subtrígonos: <span class="pill">Submandibular</span> <span class="pill">Submentual</span> <span class="pill">Carótico</span> <span class="pill">Muscular</span>
+<h4>Trígono Cervical Posterior (Lateral)</h4>
+<ul>
+  <li>Anterior: borda posterior do ECM</li>
+  <li>Posterior: borda anterior do trapézio</li>
+  <li>Inferior: terço médio da clavícula</li>
+</ul>
+Subtrígonos: <span class="pill">Occipital</span> <span class="pill">Omoclavicular (supraclavicular)</span>`},
+
+{cat:1,src:"UNICH 26.1",b:"b-unc",q:"Artéria vertebral — todos os ossos da órbita e suas localizações",a:`
+<h4>Artéria Vertebral</h4>
+Primeiro ramo da <strong>artéria subclávia</strong>. Sobe pelos forames transversos de C6 a C1, penetra no crânio pelo forame magno, irriga o tronco cerebral, cerebelo e forma a artéria basilar.
+<h4>7 Ossos da Órbita</h4>
+<table>
+  <tr><th>Parede</th><th>Osso(s)</th></tr>
+  <tr><td>Teto</td><td>Frontal (maior parte) + Asa menor do esfenoide</td></tr>
+  <tr><td>Assoalho</td><td>Maxila (maior parte) + Zigomático + Palatino</td></tr>
+  <tr><td>Parede medial</td><td>Etmoide (lâmina orbitária = lâmina papiracea) + Lacrimal + Maxila + Esfenoide (corpo)</td></tr>
+  <tr><td>Parede lateral</td><td>Zigomático + Asa maior do esfenoide</td></tr>
+</table>
+<div class="alert">Macete — 7 ossos: <strong>F</strong>rontal, <strong>E</strong>sfenoide, <strong>E</strong>tmoide, <strong>M</strong>axila, <strong>Z</strong>igomático, <strong>L</strong>acrimal, <strong>P</strong>alatino</div>`},
+
+{cat:1,src:"UNICH 26.1",b:"b-unc",q:"Gânglio cervical superior — ramos terminais do trigêmeo e implicações anatômicas",a:`
+<h4>Gânglio Cervical Superior</h4>
+Maior gânglio do tronco simpático, ao nível de C1-C3. Envia ramos simpáticos pós-ganglionares via plexos perivasculares das carótidas para estruturas da cabeça: pupila (midríase), glândulas salivares e sudoríparas, músculo liso vascular.
+<h4>Ramos Terminais do Trigêmeo (NC V)</h4>
+<table>
+  <tr><th>Ramo</th><th>Ramos terminais</th><th>Território sensitivo</th></tr>
+  <tr><td><strong>V1 — Oftálmico</strong></td><td>Frontal (supraorbital, supratroclear), Lacrimal, Nasociliar</td><td>Fronte, córnea, nariz superior, pálpebra superior</td></tr>
+  <tr><td><strong>V2 — Maxilar</strong></td><td>Infraorbital, Zigomático, Alveolares superiores, Palatinos</td><td>Bochecha, lábio superior, nariz inferior, palato, dentes superiores</td></tr>
+  <tr><td><strong>V3 — Mandibular</strong></td><td>Auriculotemporal, Bucal, Lingual, Alveolar inferior → Mentual</td><td>Mandíbula, lábio inferior, língua anterior (tato), dentes inferiores; <em>único com motor (mastigadores)</em></td></tr>
+</table>`},
+
+{cat:1,src:"UNICH 26.1",b:"b-unc",q:"Ramo marginal da mandíbula do plexo parotídeo — toda inervação da laringe",a:`
+<h4>Ramo Marginal da Mandíbula (NC VII)</h4>
+Ramo do plexo parotídeo que percorre a margem inferior da mandíbula. Inerva: <strong>depressor do ângulo da boca</strong>, depressor do lábio inferior e mentual. Risco cirúrgico em dissecções submandibulares.
+<h4>Inervação da Laringe</h4>
+Toda via <strong>nervo vago (NC X)</strong>, por dois ramos:
+<table>
+  <tr><th>Nervo</th><th>Tipo</th><th>Território</th></tr>
+  <tr><td>N. Laríngeo Superior — <strong>Ramo Interno</strong></td><td>Sensitivo</td><td>Mucosa acima das pregas vocais (epiglote, vestíbulo laríngeo)</td></tr>
+  <tr><td>N. Laríngeo Superior — <strong>Ramo Externo</strong></td><td>Motor</td><td>M. cricotireóideo (único músculo intrínseco não pelo NLR)</td></tr>
+  <tr><td><strong>N. Laríngeo Recorrente (NLR)</strong></td><td>Motor + Sensitivo</td><td>Todos os outros músculos intrínsecos; mucosa abaixo das pregas vocais</td></tr>
+</table>
+<div class="alert">⚠️ Lesão do NLR esquerdo: mais comum (trajeto mais longo — passa pelo arco aórtico). Causa rouquidão ipsilateral.</div>`},
+
+{cat:1,src:"UNICH 26.1",b:"b-unc",q:"N. Acessório — limites da cavidade nasal",a:`
+<h4>Nervo Acessório (NC XI)</h4>
+Inerva os músculos <strong>ECM</strong> (esternocleidomastoideo) e <strong>trapézio</strong>. Origem dupla: raiz cranial (bulbo) + raiz espinhal (C1-C5). Sai pelo forame jugular.
+<h4>Limites da Cavidade Nasal</h4>
+<table>
+  <tr><th>Parede</th><th>Estruturas</th></tr>
+  <tr><td>Anterior</td><td>Abertura piriforme</td></tr>
+  <tr><td>Posterior</td><td>Coanas (comunicam com a nasofaringe)</td></tr>
+  <tr><td>Superior (teto)</td><td>Ossos nasais, lâmina cribriforme do etmoide, corpo do esfenoide</td></tr>
+  <tr><td>Inferior (assoalho)</td><td>Processo palatino da maxila + lâmina horizontal do palatino</td></tr>
+  <tr><td>Medial</td><td>Septo nasal: lâmina perp. do etmoide + vômer + cartilagem do septo</td></tr>
+  <tr><td>Lateral</td><td>Maxila, lacrimal, etmoide (conchas sup/méd), concha nasal inferior, palatino, pterigoide</td></tr>
+</table>`},
+
+{cat:1,src:"UFC 24.2",b:"b-ufc",q:"Conteúdo do forame oval",a:`
+<h4>Forame Oval — Conteúdo</h4>
+<ul>
+  <li><strong>Nervo mandibular (V3)</strong> — principal estrutura</li>
+  <li><strong>Nervo petroso menor</strong> (ramo do NC IX — parassimpático para parótida)</li>
+  <li><strong>Artéria meníngea acessória</strong> (ramo da artéria maxilar)</li>
+  <li><strong>Veia emissária</strong> (seio cavernoso ↔ plexo pterigoideo)</li>
+</ul>
+<div class="alert">Macete: <strong>V3 + Petroso Menor + Meníngea Acessória + Veia emissária</strong></div>`},
+
+{cat:1,src:"UFC 24.2",b:"b-ufc",q:"Ramos da artéria carótida externa",a:`
+<h4>8 Ramos Clássicos</h4>
+<table>
+  <tr><th>Grupo</th><th>Ramo</th><th>Irriga</th></tr>
+  <tr><td rowspan="3">Anteriores</td><td>A. tireoidea superior</td><td>Tireoide (polo sup.), laringe</td></tr>
+  <tr><td>A. lingual</td><td>Língua, glândula sublingual</td></tr>
+  <tr><td>A. facial</td><td>Face, glândula submandibular</td></tr>
+  <tr><td rowspan="2">Posteriores</td><td>A. occipital</td><td>Couro cabeludo posterior</td></tr>
+  <tr><td>A. auricular posterior</td><td>Pavilhão auricular, couro cabeludo retroauricular</td></tr>
+  <tr><td>Medial</td><td>A. faríngea ascendente</td><td>Faringe, meninges, tímpano</td></tr>
+  <tr><td rowspan="2">Terminais</td><td>A. maxilar</td><td>Mandíbula, dentes, dura-máter (meníngea média), palato</td></tr>
+  <tr><td>A. temporal superficial</td><td>Couro cabeludo temporal, face lateral</td></tr>
+</table>`},
+
+{cat:1,src:"UFC 24.2",b:"b-ufc",q:"Limites da faringe",a:`
+<h4>Limites Gerais</h4>
+<table>
+  <tr><th>Limite</th><th>Estrutura</th></tr>
+  <tr><td>Superior</td><td>Base do crânio (corpo do esfenoide + occipital basiiar)</td></tr>
+  <tr><td>Inferior</td><td>Borda inferior da cartilagem cricoide (C6) → continua como esôfago</td></tr>
+  <tr><td>Anterior</td><td>Coanas (nasofaringe) / Istmo das fauces (orofaringe) / Abertura da laringe (laringofaringe)</td></tr>
+  <tr><td>Posterior</td><td>Fáscia bucofaríngea sobre os músculos constritores, espaço retrofaríngeo</td></tr>
+</table>
+<h4>Divisões e Limites Internos</h4>
+<ul>
+  <li><strong>Nasofaringe</strong>: base do crânio → palato mole</li>
+  <li><strong>Orofaringe</strong>: palato mole → borda sup. da epiglote</li>
+  <li><strong>Laringofaringe (hipofaringe)</strong>: borda sup. da epiglote → C6</li>
+</ul>`},
+
+{cat:1,src:"UFC 24.2",b:"b-ufc",q:"Limites dos dois maiores trígonos do pescoço e subtrígonos",a:`
+<h4>Trígono Cervical Anterior</h4>
+<ul>
+  <li>Superior: margem inferior da mandíbula</li>
+  <li>Posterior: borda anterior do ECM</li>
+  <li>Medial: linha mediana</li>
+</ul>
+<strong>Subtrígonos:</strong>
+<table>
+  <tr><th>Subtrígono</th><th>Limites</th></tr>
+  <tr><td>Submentual</td><td>Ventres anteriores dos digástricos + corpo do hioide</td></tr>
+  <tr><td>Submandibular</td><td>Margem inf. mandíbula + ventres ant. e post. do digástrico</td></tr>
+  <tr><td>Carótico</td><td>Ventre sup. do omohioideo + ventre post. do digástrico + borda ant. do ECM</td></tr>
+  <tr><td>Muscular</td><td>Ventre sup. omohioideo + borda ant. ECM + plano mediano</td></tr>
+</table>
+<h4>Trígono Cervical Posterior (Lateral)</h4>
+<ul>
+  <li>Anterior: borda posterior do ECM</li>
+  <li>Posterior: borda anterior do trapézio</li>
+  <li>Inferior: terço médio da clavícula</li>
+</ul>
+<strong>Subtrígonos:</strong>
+<table>
+  <tr><th>Subtrígono</th><th>Limites</th></tr>
+  <tr><td>Occipital</td><td>Borda post. ECM + borda ant. trapézio + ventre inf. omohioideo</td></tr>
+  <tr><td>Omoclavicular</td><td>Borda post. ECM + ventre inf. omohioideo + terço médio da clavícula</td></tr>
+</table>`},
+
+{cat:1,src:"UFC 2015",b:"b-ufc",q:"Músculos extrínsecos da língua — inervação motora e sensitiva",a:`
+<h4>Músculos Extrínsecos</h4>
+<table>
+  <tr><th>Músculo</th><th>Ação</th></tr>
+  <tr><td>Genioglosso</td><td>Protrui a língua (principal protrusor)</td></tr>
+  <tr><td>Hioglosso</td><td>Deprime e retrai a língua</td></tr>
+  <tr><td>Estiloglosso</td><td>Retrai e eleva a língua</td></tr>
+  <tr><td>Palatoglosso</td><td>Eleva a raiz da língua, fecha o istmo das fauces</td></tr>
+</table>
+<h4>Inervação Motora</h4>
+Todos pelo <strong>N. Hipoglosso (NC XII)</strong>, exceto o palatoglosso → <strong>NC X (Vago)</strong> via plexo faríngeo.
+<h4>Inervação Sensitiva da Língua</h4>
+<table>
+  <tr><th>Região</th><th>Modalidade</th><th>Nervo</th></tr>
+  <tr><td rowspan="2">2/3 anteriores</td><td>Tato/pressão</td><td>N. Lingual (V3)</td></tr>
+  <tr><td>Paladar</td><td>Corda do tímpano (NC VII) via N. Lingual</td></tr>
+  <tr><td rowspan="2">1/3 posterior</td><td>Geral + Paladar</td><td>N. Glossofaríngeo (NC IX)</td></tr>
+  <tr><td>Epiglote/raiz</td><td>N. Vago (NC X)</td></tr>
+</table>`},
+
+{cat:1,src:"UFC 2015",b:"b-ufc",q:"Ramos do plexo parotídeo",a:`
+<h4>Formação</h4>
+O NC VII sai pelo forame estilomastoideo e penetra na parótida, onde se divide em dois troncos: <strong>temporofacial</strong> (superior) e <strong>cervicofacial</strong> (inferior), formando o plexo parotídeo.
+<h4>5 Ramos Terminais</h4>
+<span class="pill">Temporal</span><span class="pill">Zigomático</span><span class="pill">Bucal</span><span class="pill">Marginal da mandíbula</span><span class="pill">Cervical</span>
+<div class="alert">Macete: <strong>T</strong>o <strong>Z</strong>anzibar <strong>B</strong>y <strong>M</strong>otor <strong>C</strong>ar — Temporal, Zigomático, Bucal, Marginal, Cervical</div>
+<h4>Funções</h4>
+<ul>
+  <li>Temporal: músculos da fronte (frontal)</li>
+  <li>Zigomático: orbicular do olho (porção orbital)</li>
+  <li>Bucal: zigomático maior, levantador do lábio, bucinador</li>
+  <li>Marginal: depressores da boca e mentual</li>
+  <li>Cervical: platisma</li>
+</ul>`},
+
+{cat:1,src:"UFC 2015",b:"b-ufc",q:"Os maiores trígonos do pescoço: limites e trígonos menores",a:`
+<h4>Trígono Cervical Anterior</h4>
+Limites: margem inf. mandíbula (sup.) · linha mediana (med.) · borda ant. ECM (post.)<br>
+Subtrígonos: Submandibular · Submentual · Carótico · Muscular
+<h4>Trígono Cervical Posterior</h4>
+Limites: borda post. ECM (ant.) · borda ant. trapézio (post.) · terço médio da clavícula (inf.)<br>
+Subtrígonos: Occipital · Omoclavicular`},
+
+{cat:1,src:"UNICH 23.1",b:"b-unc",q:"Trígono omoclavicular — limites e conteúdo",a:`
+<h4>Limites</h4>
+<ul>
+  <li>Anterior: borda posterior do ECM</li>
+  <li>Superior: ventre inferior do músculo omohioideo</li>
+  <li>Inferior: terço médio da clavícula</li>
+</ul>
+<h4>Conteúdo</h4>
+<ul>
+  <li><strong>Artéria subclávia</strong> (3ª parte)</li>
+  <li><strong>Veia subclávia</strong></li>
+  <li><strong>Troncos do plexo braquial</strong> (inferior e médio)</li>
+  <li>Linfonodos supraclaviculares</li>
+  <li><strong>Ducto torácico</strong> (lado esquerdo)</li>
+  <li>Nervo frênico (na borda anterior do escaleno anterior)</li>
+</ul>`},
+
+{cat:1,src:"UNICH 23.1",b:"b-unc",q:"Cartilagem cricoide — função de delimitação anatômica",a:`
+<h4>Características</h4>
+Única cartilagem laríngea em forma de <strong>anel completo</strong>. Localizada ao nível de <strong>C6</strong>.
+<h4>Funções de Delimitação</h4>
+<ul>
+  <li>Delimita a <strong>junção laringe-traqueia</strong> (abaixo dela começa a traqueia)</li>
+  <li>Delimita a <strong>junção faringe-esôfago</strong> (posteriormente, na borda inferior da cricoide, a laringofaringe continua como esôfago)</li>
+  <li>Marco anatômico para <strong>cricotireoidostomia de emergência</strong> (membrana cricotireoidea, entre a cricoide e a tireoide)</li>
+  <li>Referência para início das estruturas cervicais inferiores (C6)</li>
+</ul>`},
+
+{cat:1,src:"UNICH 23.1",b:"b-unc",q:"Forame oval — conteúdo",a:`
+<h4>Conteúdo do Forame Oval</h4>
+<ul>
+  <li><strong>Nervo mandibular (V3)</strong> — principal</li>
+  <li><strong>Nervo petroso menor</strong> (NC IX — para gânglio ótico → parótida)</li>
+  <li><strong>Artéria meníngea acessória</strong> (ramo da maxilar)</li>
+  <li><strong>Veia emissária</strong> do seio cavernoso</li>
+</ul>`},
+
+{cat:1,src:"UNICH 23.1",b:"b-unc",q:"Nervo oculomotor — função",a:`
+<h4>NC III — Oculomotor</h4>
+<strong>Motor somático:</strong>
+<ul>
+  <li>M. elevador da pálpebra superior</li>
+  <li>M. reto superior (eleva o olho)</li>
+  <li>M. reto medial (aduz)</li>
+  <li>M. reto inferior (deprime)</li>
+  <li>M. oblíquo inferior (eleva em adução)</li>
+</ul>
+<strong>Motor visceral (parassimpático):</strong>
+<ul>
+  <li>Fibras pré-ganglionares → <strong>gânglio ciliar</strong> → M. esfíncter da pupila (miose) + M. ciliar (acomodação)</li>
+</ul>
+<h4>Lesão do NC III</h4>
+<ul>
+  <li>Ptose (pálpebra caída)</li>
+  <li>Midríase (pupila dilatada — fibras parassimpáticas periféricas)</li>
+  <li>Olho "para baixo e para fora" (ação do IV e VI sem oposição)</li>
+  <li>Diplopia</li>
+</ul>`},
+
+{cat:1,src:"UNICH 23.1",b:"b-unc",q:"Prega vocal falsa — função",a:`
+<h4>Localização</h4>
+Acima das pregas vocais verdadeiras, separadas pelo ventrículo laríngeo. Também chamada de <strong>prega vestibular</strong>.
+<h4>Funções</h4>
+<ul>
+  <li><strong>Proteção das vias aéreas</strong>: fechamento durante a deglutição (válvula de segurança)</li>
+  <li><strong>Aumento de pressão intratorácica</strong>: manobra de Valsalva, tosse, espirro, defecação, parto</li>
+  <li><strong>Não participa da fonação normal</strong> — fonação compensatória em paralisia das pregas verdadeiras</li>
+</ul>
+<table>
+  <tr><th></th><th>Prega Verdadeira</th><th>Prega Falsa</th></tr>
+  <tr><td>Função</td><td>Fonação</td><td>Proteção/válvula</td></tr>
+  <tr><td>Mucosa</td><td>Epitélio escamoso</td><td>Epitélio respiratório</td></tr>
+  <tr><td>Coloração</td><td>Branco-nacarada</td><td>Rosada</td></tr>
+</table>`},
+
+{cat:1,src:"UNICH 23.2",b:"b-unc",q:"Nervo hipoglosso — trajeto e função",a:`
+<h4>Origem</h4>
+Sulco anterolateral do bulbo (entre oliva e pirâmide), por vários filamentos que se unem.
+<h4>Trajeto</h4>
+Canal do hipoglosso (osso occipital) → lateral às aa. carótidas → cruza o NC X → arco hipoglosso → entra na língua
+<h4>Função</h4>
+Inervação <strong>motora</strong> de todos os músculos intrínsecos e extrínsecos da língua, exceto o palatoglosso (NC X).
+<h4>Lesão</h4>
+<ul>
+  <li>Desvio da língua para o <strong>lado ipsilateral</strong> à lesão (ao protrui)</li>
+  <li>Atrofia e fasciculações (lesão do NMI)</li>
+  <li>Disartria, disfagia</li>
+</ul>`},
+
+{cat:1,src:"UNICH 23.2",b:"b-unc",q:"Inervação da língua — sensibilidade especial e motricidade",a:`
+<h4>Inervação Sensitiva</h4>
+<table>
+  <tr><th>Região</th><th>Modalidade</th><th>Nervo</th></tr>
+  <tr><td>2/3 ant.</td><td>Tato geral</td><td>N. Lingual (V3)</td></tr>
+  <tr><td>2/3 ant.</td><td>Paladar (gustação)</td><td>Corda do tímpano (NC VII)</td></tr>
+  <tr><td>1/3 post.</td><td>Geral + paladar</td><td>N. Glossofaríngeo (NC IX)</td></tr>
+  <tr><td>Epiglote/raiz</td><td>Geral + paladar</td><td>N. Vago (NC X)</td></tr>
+</table>
+<h4>Inervação Motora</h4>
+<strong>N. Hipoglosso (NC XII)</strong> → todos os músculos intrínsecos e extrínsecos, exceto palatoglosso (NC X).`},
+
+{cat:1,src:"UNICH 24.1",b:"b-unc",q:"Músculo genioglosso — origem, inserção, ação e inervação",a:`
+<h4>Genioglosso</h4>
+<ul>
+  <li><strong>Origem</strong>: espinha mental (apófise geni) da mandíbula</li>
+  <li><strong>Inserção</strong>: face dorsal da língua em leque + corpo do hioide</li>
+  <li><strong>Ação</strong>: protrui a língua (principal protrusor), deprime o centro, traciona o hioide anteriormente</li>
+  <li><strong>Inervação</strong>: N. Hipoglosso (NC XII)</li>
+</ul>
+<div class="alert">É o maior músculo extrínseco da língua. Sua contração bilateral protruída de maneira simétrica. Paralisia bilateral → glossoptose (obstrução de VAS — ex: Pierre Robin).</div>`},
+
+{cat:1,src:"UNICH 24.1",b:"b-unc",q:"Formação do plexo parotídeo",a:`
+<h4>Trajeto do NC VII Intraparotídeo</h4>
+<ol style="padding-left:18px">
+  <li>NC VII emerge do forame estilomastoideo</li>
+  <li>Dá ramos extra-parotídeos: auricular posterior, digástrico (ventre post.), estilo-hioideo</li>
+  <li>Penetra na parótida e se divide em dois troncos:<br>
+    • <strong>Temporofacial</strong> (superior)<br>
+    • <strong>Cervicofacial</strong> (inferior)
+  </li>
+  <li>Esses troncos se interconectam formando o <strong>plexo parotídeo</strong></li>
+  <li>Originam os 5 ramos terminais: <em>Temporal · Zigomático · Bucal · Marginal · Cervical</em></li>
+</ol>`},
+
+{cat:1,src:"UNICH 24.1",b:"b-unc",q:"Artéria vertebral — toda inervação sensitiva e motora da laringe",a:`
+<h4>Artéria Vertebral</h4>
+1º ramo da subclávia. Sobe pelos forames transversos C6→C1, entra no crânio pelo forame magno. Irriga tronco cerebral, cerebelo, medula cervical. Une-se à contralateral → A. basilar.
+<h4>Inervação da Laringe — Via Vago (NC X)</h4>
+<table>
+  <tr><th>Nervo</th><th>Tipo</th><th>Estruturas</th></tr>
+  <tr><td>N. Laríngeo Superior — <strong>ramo interno</strong></td><td>Sensitivo</td><td>Mucosa acima das pregas vocais</td></tr>
+  <tr><td>N. Laríngeo Superior — <strong>ramo externo</strong></td><td>Motor</td><td>M. cricotireóideo (ÚNICO externo ao NLR)</td></tr>
+  <tr><td><strong>N. Laríngeo Recorrente (NLR)</strong></td><td>Motor + Sensitivo</td><td>Todos os demais músculos intrínsecos + mucosa abaixo das pregas</td></tr>
+</table>`},
+
+{cat:1,src:"UNICH 25.1",b:"b-unc",q:"Ramo marginal da mandíbula — plexo cervical superficial",a:`
+<h4>Ramo Marginal da Mandíbula (NC VII)</h4>
+Percorre a margem inferior da mandíbula (por vezes abaixo dela). Inerva: depressor do ângulo da boca, depressor do lábio inferior, mentual. Lesão: desvio contralateral da boca.
+<h4>Plexo Cervical Superficial</h4>
+Emerge pelo <strong>ponto de Erb</strong> (borda posterior do ECM, meio do seu trajeto). Raízes C1-C4.
+<table>
+  <tr><th>Ramo</th><th>Raízes</th><th>Território</th></tr>
+  <tr><td>N. occipital menor</td><td>C2</td><td>Couro cabeludo posterior e lateral</td></tr>
+  <tr><td>N. auricular maior</td><td>C2, C3</td><td>Pavilhão auricular, parótida, região mastoidea</td></tr>
+  <tr><td>N. transverso do pescoço</td><td>C2, C3</td><td>Pele anterior do pescoço</td></tr>
+  <tr><td>Nn. supraclaviculares</td><td>C3, C4</td><td>Ombro, região clavicular, parte do tórax</td></tr>
+</table>`},
+
+{cat:1,src:"UNICH 25.1",b:"b-unc",q:"Nervo lingual — trajeto do nervo alveolar inferior",a:`
+<h4>Nervo Lingual (ramo de V3)</h4>
+Desce profundo ao pterigoideo lateral → recebe a <strong>corda do tímpano</strong> (NC VII, paladar + parassimpático) → cruza medialmente a mandíbula → assoalho da boca → lateral à língua.
+Sensitivo: 2/3 anteriores (tato). Via corda do tímpano: paladar + secretomotor para glândulas submandibular e sublingual.
+<h4>Nervo Alveolar Inferior (ramo de V3)</h4>
+<ul>
+  <li>Desce entre os pterigoideos, dá o <strong>nervo milohioideo</strong> (motor para milohioideo e ventre anterior do digástrico)</li>
+  <li>Entra pelo <strong>forame mandibular</strong></li>
+  <li>Percorre o <strong>canal mandibular</strong> dentro da mandíbula</li>
+  <li>Inerva todos os dentes inferiores (plexo dental inferior)</li>
+  <li>Sai pelo <strong>forame mentual</strong> como <strong>N. Mentual</strong> (sensitivo do mento e lábio inferior)</li>
+</ul>`},
+
+{cat:1,src:"UNICH 25.1",b:"b-unc",q:"Gânglio cervical superior — trígono perigoso da face",a:`
+<h4>Gânglio Cervical Superior</h4>
+Maior gânglio simpático, nível C1-C3. Pós-ganglionares viajam via plexo carotídeo para: dilatar a pupila, inervar glândulas da cabeça, músculo dilatador da pupila, músculo tarsal superior. Lesão → <strong>Síndrome de Horner</strong>: miose, ptose parcial, enoftalmia, anidrose ipsilateral.
+<h4>Trígono Perigoso da Face</h4>
+<ul>
+  <li>Região delimitada pelos <strong>cantos da boca e a raiz do nariz</strong></li>
+  <li>Perigosa porque as veias desta área (facial, angular) comunicam-se com o <strong>seio cavernoso</strong> via veia oftálmica (não tem válvulas)</li>
+  <li>Infecções/espremidas de lesões → <strong>tromboflebite do seio cavernoso</strong> → sepse do seio cavernoso, oftalmoplegia, meningite</li>
+</ul>`},
+
+{cat:1,src:"UNICH 25.1",b:"b-unc",q:"Nervo lacrimal — composição",a:`
+<h4>Nervo Lacrimal</h4>
+Ramo de <strong>V1 (oftálmico)</strong>. Menor dos três ramos do oftálmico.
+<h4>Composição</h4>
+<ul>
+  <li><strong>Sensitivo</strong> (V1): pele e conjuntiva da pálpebra lateral superior e canto lateral do olho</li>
+  <li><strong>Secretomotor (parassimpático)</strong>: fibras pré-ganglionares do NC VII → gânglio pterigopalatino → nervo zigomático (ramo de V2) → <strong>ramo comunicante zigomático-lacrimal</strong> → nervo lacrimal → glândula lacrimal</li>
+</ul>
+<div class="alert">O nervo lacrimal carrega fibras sensitivas (V1) + fibras parassimpáticas secretomotoras (VII) "emprestadas" do zigomático.</div>`},
+
+// ── TÓRAX E CORAÇÃO ───────────────────────────────────────────
+{cat:2,src:"UNICH 26.1",b:"b-unc",q:"Trabécula septomarginal — função e conteúdo",a:`
+<h4>Localização</h4>
+Feixe muscular no interior do <strong>ventrículo direito</strong>, estendendo-se da base do septo interventricular até o músculo papilar anterior.
+<h4>Função</h4>
+<ul>
+  <li>Transporta o <strong>ramo direito do feixe de His</strong> (sistema de condução) do septo até o músculo papilar anterior e a parede livre do VD</li>
+  <li>Garante que a despolarização atinja eficientemente a base e a parede livre do VD</li>
+  <li>Previne a superdistensão do VD (função estrutural secundária)</li>
+</ul>
+<h4>Conteúdo</h4>
+<strong>Ramo direito do feixe de His</strong> (sistema de condução cardíaco).`},
+
+{cat:2,src:"UNICH 26.1",b:"b-unc",q:"Brônquio segmentar lingular superior — explique o shunt pulmonar anatomicamente",a:`
+<h4>Brônquio Segmentar Lingular Superior</h4>
+Ramo do brônquio lobar superior esquerdo. Ventila o segmento lingular superior do lobo superior esquerdo (não há lobo médio no pulmão esquerdo — a língula é o equivalente).
+<h4>Shunt Pulmonar — Anatomia</h4>
+<strong>Shunt anatômico:</strong> sangue que retorna ao lado esquerdo do coração sem ter passado por alvéolos funcionantes.
+<ul>
+  <li><strong>Principal via</strong>: anastomose entre as veias brônquicas e as veias pulmonares via plexo venoso pulmonar superficial</li>
+  <li>Veias brônquicas da região hilar drenam para ázigo/hemiázigo</li>
+  <li>Anastomoses entre ramos terminais das artérias brônquicas com artérias pulmonares nas paredes dos bronquíolos e pleura visceral</li>
+</ul>
+<strong>Shunt fisiológico:</strong> inclui as veias de Thebésio (drenam diretamente no VE) e as veias pleurais.`},
+
+{cat:2,src:"UNICH 26.1",b:"b-unc",q:"N. Intercostal — explique anatomicamente a prensa abdominal",a:`
+<h4>Nervo Intercostal</h4>
+Ramos ventrais dos nervos espinhais T1-T11. Percorrem os espaços intercostais no sulco costal (veia-artéria-nervo, de superior para inferior).
+<h4>Prensa Abdominal</h4>
+Mecanismo de aumento da pressão intra-abdominal pela contração simultânea de:
+<ul>
+  <li><strong>Diafragma</strong> (desce — NC Frênico)</li>
+  <li><strong>Músculos abdominais</strong>: reto abdominal, oblíquo externo, oblíquo interno, transverso do abdome (inervados pelos nervos intercostais T7-T12 + iliohipogástrico + ilioinguinal)</li>
+  <li><strong>Músculos do assoalho pélvico</strong> (elevador do ânus — fechamento inferior)</li>
+</ul>
+Usada em: defecação, micção, parto, vômito, tosse, espirro e levantamento de peso.`},
+
+{cat:2,src:"UNICH 26.1",b:"b-unc",q:"N. Iliohipogástrico — explique os movimentos de alça de balde e braço de bomba",a:`
+<h4>Nervo Iliohipogástrico</h4>
+Raízes L1 (e T12). Ramo do plexo lombar. Sensitivo: pele da região inguinal e hipogástrica. Motor: músculo oblíquo interno e transverso inferior.
+<h4>Movimento de Alça de Balde (Handle of Bucket)</h4>
+Movimento das <strong>costelas médias</strong> (5ª-10ª) durante a respiração:
+<ul>
+  <li>As costelas giram em torno de seu eixo anteroposterior</li>
+  <li>A margem lateral sobe e desce como a alça de um balde</li>
+  <li>Aumenta o <strong>diâmetro lateral</strong> (transverso) do tórax</li>
+</ul>
+<h4>Movimento de Braço de Bomba (Pump Handle)</h4>
+Movimento das <strong>costelas superiores</strong> (1ª-4ª) e do esterno:
+<ul>
+  <li>As costelas giram em torno de seu eixo lateral</li>
+  <li>A parte anterior da costela e o esterno sobem e descem como um braço de bomba</li>
+  <li>Aumenta o <strong>diâmetro ântero-posterior</strong> do tórax</li>
+</ul>`},
+
+{cat:2,src:"UFC 24.2",b:"b-ufc",q:"Ramos da artéria coronária direita",a:`
+<h4>Artéria Coronária Direita (ACD)</h4>
+Origem: seio aórtico direito. Trajeto: sulco atrioventricular direito.
+<table>
+  <tr><th>Ramo</th><th>Território</th></tr>
+  <tr><td>A. do nó sinoatrial (SA)</td><td>Nó SA (~60% origina da ACD)</td></tr>
+  <tr><td>Ramos atriais direitos</td><td>Parede do átrio direito</td></tr>
+  <tr><td>A. do cone (infundibular)</td><td>Infundíbulo do ventrículo direito</td></tr>
+  <tr><td>Ramos ventriculares direitos anteriores</td><td>Parede anterior do VD</td></tr>
+  <tr><td><strong>A. marginal direita</strong> (ramo agudo)</td><td>Margem direita do coração, VD</td></tr>
+  <tr><td>Ramos posteriores do VD</td><td>Parede posterior do VD</td></tr>
+  <tr><td><strong>A. do nó AV</strong></td><td>Nó AV (~80% origina da ACD — dominância direita)</td></tr>
+  <tr><td><strong>A. interventricular posterior (IVP)</strong></td><td>1/3 posterior do SIV, parede inferior do VE</td></tr>
+  <tr><td>Ramos septais posteriores</td><td>Porção posterior do septo</td></tr>
+</table>
+<div class="alert">Dominância direita (~75%): ACD emite a IVP. Infarto de parede inferior (Q em DII, DIII, aVF) = oclusão da ACD.</div>`},
+
+{cat:2,src:"UFC 24.2",b:"b-ufc",q:"Irrigação da parede torácica",a:`
+<h4>Artérias da Parede Torácica</h4>
+<table>
+  <tr><th>Artéria</th><th>Origem</th><th>Território</th></tr>
+  <tr><td><strong>A. torácica interna (mamária interna)</strong></td><td>Subclávia</td><td>Espaços intercostais anteriores (ramos intercostais anteriores), mamária, esterno</td></tr>
+  <tr><td>A. musculofrênica</td><td>Ramo terminal da torácica interna</td><td>Intercostais inferiores anteriores + diafragma lateral</td></tr>
+  <tr><td>A. epigástrica superior</td><td>Ramo terminal da torácica interna</td><td>Reto abdominal superior</td></tr>
+  <tr><td><strong>Aa. intercostais posteriores</strong></td><td>Aorta torácica (3ª-11ª) / subclávia (1ª-2ª)</td><td>Espaços intercostais posteriores e laterais</td></tr>
+  <tr><td>A. subcostal</td><td>Aorta torácica</td><td>Abaixo da 12ª costela</td></tr>
+</table>`},
+
+{cat:2,src:"UFC 24.2",b:"b-ufc",q:"Ramos da aorta torácica",a:`
+<h4>Ramos Viscerais</h4>
+<ul>
+  <li><strong>Ramos brônquicos</strong> (2 esquerdos + 1 direito): irrigam brônquios e parênquima pulmonar</li>
+  <li><strong>Ramos esofágicos</strong>: irrigam esôfago torácico</li>
+  <li><strong>Ramos pericárdicos</strong></li>
+  <li><strong>Ramos mediastinais</strong></li>
+</ul>
+<h4>Ramos Parietais</h4>
+<ul>
+  <li><strong>Aa. intercostais posteriores</strong>: 9 pares (3ª a 11ª costelas) — as 2 primeiras vêm do tronco costocervical da subclávia</li>
+  <li><strong>A. subcostal</strong>: abaixo da 12ª costela</li>
+  <li><strong>Aa. frênicas superiores</strong>: face superior do diafragma</li>
+</ul>`},
+
+{cat:2,src:"UFC 2015",b:"b-ufc",q:"Disposição das artérias e veias pulmonares",a:`
+<h4>Artérias Pulmonares</h4>
+Transportam sangue venoso (desoxigenado) do VD aos pulmões.
+<ul>
+  <li>Tronco pulmonar: origina do infundíbulo do VD, bifurca abaixo do arco aórtico</li>
+  <li>A. pulmonar direita: mais longa, passa posterior à aorta ascendente e VCS</li>
+  <li>A. pulmonar esquerda: mais curta, ligada ao ligamento arterioso (resquício do ducto arterioso)</li>
+</ul>
+<h4>Veias Pulmonares (4 veias)</h4>
+<table>
+  <tr><th>Veia</th><th>Drena</th></tr>
+  <tr><td>Pulmonar superior direita</td><td>Lobos superior e médio direitos</td></tr>
+  <tr><td>Pulmonar inferior direita</td><td>Lobo inferior direito</td></tr>
+  <tr><td>Pulmonar superior esquerda</td><td>Lobo superior esquerdo</td></tr>
+  <tr><td>Pulmonar inferior esquerda</td><td>Lobo inferior esquerdo</td></tr>
+</table>
+<h4>Disposição no Hilo Pulmonar</h4>
+Hilo direito (de cima para baixo): <strong>A</strong>rtéria lobar superior → <strong>B</strong>rônquio → <strong>V</strong>eia<br>
+Hilo esquerdo: <strong>A</strong>rtéria pulmonar (acima do brônquio) → <strong>B</strong>rônquio → <strong>V</strong>eia`},
+
+{cat:2,src:"UFC 2015",b:"b-ufc",q:"Ramos da coronária direita",a:`
+<h4>Ramos da ACD (em ordem proximal→distal)</h4>
+<span class="pill">A. do nó SA (60%)</span><span class="pill">Ramos atriais direitos</span><span class="pill">A. do cone</span><span class="pill">Ramos ventriculares direitos ant.</span><span class="pill">A. marginal direita</span><span class="pill">A. do nó AV (80%)</span><span class="pill">A. interventricular posterior</span><span class="pill">Ramos septais posteriores</span>
+<div class="alert">A IVP irriga o 1/3 posterior do septo e determina a dominância coronariana (direita ~75%).</div>`},
+
+{cat:2,src:"UFC 2015",b:"b-ufc",q:"Órgãos e estruturas relacionadas à área cardíaca na radiografia",a:`
+<h4>Radiografia em PA/PA</h4>
+<table>
+  <tr><th>Margem</th><th>Estruturas</th></tr>
+  <tr><td>Direita</td><td>Veia cava superior (superior) + átrio direito (inferior)</td></tr>
+  <tr><td>Esquerda</td><td>Arco aórtico + tronco pulmonar + aurícula esquerda + VE</td></tr>
+  <tr><td>Inferior</td><td>Cúpulas diafragmáticas direita e esquerda</td></tr>
+</table>
+<h4>Radiografia Lateral</h4>
+<ul>
+  <li>Anterior: esterno e cartilagens costais</li>
+  <li>Posterior: esôfago, traqueia, coluna vertebral</li>
+  <li>Superior: carina, vasos da base</li>
+  <li>Inferior: cúpulas diafragmáticas</li>
+</ul>`},
+
+{cat:2,src:"UFC 2015",b:"b-ufc",q:"Irrigação da parede torácica",a:`
+<h4>Arterias</h4>
+<ul>
+  <li><strong>A. torácica interna (mamária)</strong>: ramo da subclávia → intercostais anteriores + ramos perfurantes</li>
+  <li><strong>Aa. intercostais posteriores</strong> (3ª-11ª): ramos diretos da aorta torácica</li>
+  <li><strong>Aa. intercostais posteriores superiores</strong> (1ª-2ª): do tronco costocervical (subclávia)</li>
+  <li><strong>A. musculofrênica</strong>: terminal da torácica interna → intercostais 7ª-9ª ant.</li>
+  <li><strong>A. subcostal</strong>: ramo da aorta torácica</li>
+</ul>
+<h4>Cada Espaço Intercostal</h4>
+VAN = Veia · Artéria · Nervo (de superior para inferior, no sulco costal)`},
+
+{cat:2,src:"UNICH 23.1",b:"b-unc",q:"Músculo papilar anterior — sistema de condução cardíaca que se liga a ele",a:`
+<h4>Músculo Papilar Anterior</h4>
+O maior músculo papilar do VD e do VE. Localizado na parede anterior de cada ventrículo.
+<h4>Sistema de Condução — Ligação com o Papilar Anterior</h4>
+A <strong>trabécula septomarginal</strong> (banda moderadora) transporta o <strong>ramo direito do feixe de His</strong> do septo interventricular até o músculo papilar anterior do VD.
+<h4>Sequência do Sistema de Condução</h4>
+Nó SA → Vias internodais (anterior/média/posterior) → Nó AV → Feixe de His → Ramo direito e esquerdo → Fibras de Purkinje → Músculo papilar → Miocárdio ventricular`},
+
+{cat:2,src:"UNICH 23.2",b:"b-unc",q:"Ramos septais da artéria descendente anterior",a:`
+<h4>Artéria Descendente Anterior (ADA / IVA)</h4>
+Ramo da artéria coronária esquerda (ACE). Percorre o sulco interventricular anterior.
+<h4>Ramos Septais</h4>
+<ul>
+  <li>Emergem perpendicularmente à ADA e penetram no septo interventricular</li>
+  <li>Irrigam os <strong>2/3 anteriores do septo interventricular</strong></li>
+  <li>Incluem a irrigação do <strong>feixe de His</strong> e dos <strong>ramos do feixe</strong></li>
+  <li>Variam em número (geralmente 6-10 ramos septais)</li>
+</ul>
+<div class="alert">Oclusão proximal da ADA: infarto anterior extenso + bloqueio de ramo esquerdo (BRE) — pior prognóstico.</div>`},
+
+{cat:2,src:"UNICH 23.2",b:"b-unc",q:"Inervação dos músculos cardíacos",a:`
+<h4>Inervação Autonômica do Coração</h4>
+<strong>Simpática:</strong>
+<ul>
+  <li>Pré-ganglionares: segmentos T1-T5 da medula</li>
+  <li>Pós-ganglionares: gânglios cervicais (superior, médio, cervicotorácico) e torácicos superiores</li>
+  <li>Efeitos: cronotropismo +, inotropismo +, dromotropismo +, batmotropismo +</li>
+</ul>
+<strong>Parassimpática (Vago — NC X):</strong>
+<ul>
+  <li>Pré-ganglionares: núcleo dorsal do vago e núcleo ambíguo</li>
+  <li>Pós-ganglionares: gânglios intramurais no coração</li>
+  <li>Efeitos: cronotropismo −, dromotropismo − (principalmente no nó SA e AV)</li>
+</ul>
+<h4>Dor Cardíaca (Angina)</h4>
+Fibras aferentes viscerais acompanham as fibras simpáticas → T1-T5 → dor referida no precórdio, MS esquerdo, mandíbula.`},
+
+{cat:2,src:"UNICH 24.1",b:"b-unc",q:"Crista terminal do átrio direito — dois tipos de shunt fisiológico",a:`
+<h4>Crista Terminal</h4>
+Crista muscular interna do átrio direito que separa a porção lisa posterior (derivada do seio venoso) da porção trabeculada anterior (aurícula). Externamente corresponde ao sulco terminal. O nó SA localiza-se próximo ao topo da crista terminal.
+<h4>2 Tipos de Shunt Fisiológico</h4>
+<strong>1. Shunt anatômico:</strong>
+<ul>
+  <li>Sangue que retorna ao coração esquerdo sem ter passado por capilares alveolares</li>
+  <li>Anastomose veias brônquicas-veias pulmonares</li>
+  <li>Veias de Thebésio (drenagem direta no VE)</li>
+  <li>Representa ~2-3% do débito cardíaco</li>
+</ul>
+<strong>2. Shunt fisiológico:</strong>
+<ul>
+  <li>Regiões com V/Q = 0 (perfusão sem ventilação)</li>
+  <li>Ex: consolidação pulmonar, atelectasia</li>
+  <li>Inclui o shunt anatômico + áreas de baixa relação V/Q</li>
+</ul>`},
+
+{cat:2,src:"UNICH 24.1",b:"b-unc",q:"Artéria musculofrênica — toda a circulação da parede torácica",a:`
+<h4>Artéria Musculofrênica</h4>
+Ramo terminal lateral da <strong>artéria torácica interna</strong>. Corre ao longo da margem costal do diafragma. Irriga: intercostais anteriores (7ª-9ª costelas), diafragma lateral, músculos abdominais superiores.
+<h4>Circulação Completa da Parede Torácica</h4>
+<table>
+  <tr><th>Artéria</th><th>Origem</th><th>Território</th></tr>
+  <tr><td>Torácica interna</td><td>Subclávia</td><td>Intercostais ant. 1-6, esterno, mama</td></tr>
+  <tr><td>Musculofrênica</td><td>Terminal da torácica interna</td><td>Intercostais ant. 7-9, diafragma lateral</td></tr>
+  <tr><td>Epigástrica superior</td><td>Terminal da torácica interna</td><td>Reto abdominal superior</td></tr>
+  <tr><td>Intercostais post. 1-2</td><td>Tronco costocervical (subclávia)</td><td>1º e 2º espaços post.</td></tr>
+  <tr><td>Intercostais post. 3-11</td><td>Aorta torácica</td><td>3º ao 11º espaços post.</td></tr>
+  <tr><td>A. subcostal</td><td>Aorta torácica</td><td>Abaixo da 12ª costela</td></tr>
+</table>`},
+
+{cat:2,src:"UNICH 24.1",b:"b-unc",q:"Ducto torácico e hilo pulmonar",a:`
+<h4>Ducto Torácico</h4>
+Principal coletor linfático do corpo. Origina-se da <strong>cisterna do quilo</strong> (L1-L2), sobe pelo mediastino posterior (à direita da aorta), cruza para a esquerda ao nível de T5, sobe pelo mediastino superior e drena na <strong>junção da veia jugular interna esquerda com a veia subclávia esquerda</strong> (ângulo venoso esquerdo).
+<h4>Hilo Pulmonar — Disposição das Estruturas</h4>
+<table>
+  <tr><th></th><th>Direito</th><th>Esquerdo</th></tr>
+  <tr><td>Superior</td><td>Brônquio lobar superior</td><td>Artéria pulmonar</td></tr>
+  <tr><td>Anterior-inferior</td><td>Artéria pulmonar</td><td>Brônquio principal</td></tr>
+  <tr><td>Inferior</td><td>Veias pulmonares (sup. e inf.)</td><td>Veias pulmonares (sup. e inf.)</td></tr>
+</table>`},
+
+{cat:2,src:"UNICH 25.1",b:"b-unc",q:"Hemiázigos acessória — composição do segmento pulmonar",a:`
+<h4>Hemiázigos Acessória</h4>
+Veia localizada à esquerda da coluna vertebral, drena as <strong>intercostais posteriores do lado esquerdo da 4ª à 8ª costelas</strong>. Cruza a coluna e drena na veia ázigos. (Hemiázigos drena as intercostais esquerdas inferiores — 9ª a 11ª.)
+<h4>Composição do Segmento Pulmonar</h4>
+<ul>
+  <li>Unidade funcional e cirúrgica do pulmão</li>
+  <li>Cada segmento possui:<br>
+    • <strong>Brônquio segmentar</strong> (3ª subdivisão brônquica)<br>
+    • <strong>Artéria segmentar</strong> (ramo da artéria pulmonar — caminha junto ao brônquio)<br>
+    • <strong>Veia segmentar</strong> (drena na periferia, no septo intersegmentar)<br>
+    • Parênquima pulmonar próprio
+  </li>
+  <li>Pulmão direito: 10 segmentos | Pulmão esquerdo: 8-10 segmentos</li>
+</ul>`},
+
+{cat:2,src:"UNICH 25.1",b:"b-unc",q:"Artéria epigástrica superior — ramos da aorta torácica",a:`
+<h4>Artéria Epigástrica Superior</h4>
+Ramo terminal medial da <strong>artéria torácica interna</strong>. Desce pelo músculo reto abdominal, anastomosa-se com a <strong>artéria epigástrica inferior</strong> (ramo da ilíaca externa) — importante via de circulação colateral na coarctação da aorta.
+<h4>Ramos da Aorta Torácica</h4>
+<strong>Viscerais:</strong> Ramos brônquicos · Ramos esofágicos · Ramos pericárdicos · Ramos mediastinais<br>
+<strong>Parietais:</strong> Aa. intercostais posteriores (3ª-11ª) · A. subcostal · Aa. frênicas superiores`},
+
+{cat:2,src:"UNICH 25.1",b:"b-unc",q:"Veia ázigos — vias hepatofugais da gástrica esquerda e das gástricas curtas",a:`
+<h4>Veia Ázigos</h4>
+Drena intercostais posteriores direitas (4ª-11ª) + hemiázigos + hemiázigos acessória. Drena na <strong>veia cava superior</strong> ao nível de T4-T5. Forma parte do sistema de circulação colateral entre VCI e VCS.
+<h4>Vias Hepatofugais (Hipertensão Portal)</h4>
+São as vias de circulação colateral que desviam o sangue portal do fígado:
+<table>
+  <tr><th>Via</th><th>Trajeto</th><th>Manifestação clínica</th></tr>
+  <tr><td><strong>Gastroesofágica</strong></td><td>V. gástrica esquerda + gástricas curtas → plexo esofágico → veia ázigos → VCS</td><td>Varizes esofágicas (mais perigosa)</td></tr>
+  <tr><td><strong>Umbilical/paraumbilical</strong></td><td>V. paraumbilical → v. epigástricas → superficiais da parede</td><td>Caput medusae</td></tr>
+  <tr><td><strong>Retal</strong></td><td>V. retal superior (porta) → v. retais inf/média (VCI)</td><td>Hemorroidas</td></tr>
+  <tr><td><strong>Retroperitoneal</strong></td><td>V. esplenorrenal espontânea</td><td>Varizes retroperitoneais</td></tr>
+</table>`},
+
+// ── ABDOME ────────────────────────────────────────────────────
+{cat:3,src:"UNICH 26.1",b:"b-unc",q:"Lâmina anterior da bainha do reto — todas as camadas abdominais de externo para interno",a:`
+<h4>Camadas da Parede Abdominal (externo → interno)</h4>
+<ol style="padding-left:18px">
+  <li>Pele</li>
+  <li>Tela subcutânea (fáscia de Camper — gordurosa + fáscia de Scarpa — membranosa)</li>
+  <li><strong>M. Oblíquo externo</strong> (aponeurose anterior da bainha do reto)</li>
+  <li><strong>M. Oblíquo interno</strong> (aponeurose divide-se: lâmina ant. + post. da bainha do reto acima da linha arqueada)</li>
+  <li><strong>M. Transverso do abdome</strong> (aponeurose → lâmina posterior acima da linha arqueada)</li>
+  <li>Fáscia transversal</li>
+  <li>Gordura pré-peritoneal (extraperitoneal)</li>
+  <li>Peritônio parietal</li>
+</ol>
+<h4>Lâmina Anterior da Bainha do Reto</h4>
+<strong>Acima da linha arqueada:</strong> aponeurose do oblíquo externo + lâmina ant. da aponeurose do oblíquo interno.<br>
+<strong>Abaixo da linha arqueada:</strong> aponeurose de <strong>todos os 3 músculos</strong> passam anteriores ao reto.`},
+
+{cat:3,src:"UNICH 26.1",b:"b-unc",q:"Recesso paraduodenal — espaço porta hepático anatomicamente",a:`
+<h4>Recesso Paraduodenal</h4>
+Prega e fossa peritoneal localizada à esquerda da porção ascendente do duodeno (4ª porção). Clinicamente importante pois pode ser sítio de hérnia interna paraduodenal esquerda.
+<h4>Espaço (Hilo) Porta Hepático</h4>
+O hilo hepático está contido no <strong>ligamento hepatoduodenal</strong>, que é a borda livre do omento menor.
+<table>
+  <tr><th>Estrutura</th><th>Posição</th></tr>
+  <tr><td>Veia porta</td><td>Posterior</td></tr>
+  <tr><td>A. hepática própria</td><td>Anterior esquerda</td></tr>
+  <tr><td>Ducto colédoco</td><td>Anterior direita</td></tr>
+</table>
+O ligamento hepatoduodenal forma a borda anterior do <strong>forame omental (epiploico)</strong>.`},
+
+{cat:3,src:"UFC 24.2",b:"b-ufc",q:"Formação do cordão inguinal (funículo espermático)",a:`
+<h4>Funículo Espermático (Cordão Inguinal)</h4>
+Formado no anel inguinal profundo e percorre o canal inguinal até o testículo.
+<h4>Conteúdo</h4>
+<ul>
+  <li><strong>Ducto deferente</strong></li>
+  <li><strong>A. testicular</strong> (ramo da aorta abdominal)</li>
+  <li><strong>A. do ducto deferente</strong> (ramo da vesical inferior)</li>
+  <li><strong>A. cremastérica</strong> (ramo da epigástrica inferior)</li>
+  <li><strong>Plexo pampiniforme</strong> (veias testiculares)</li>
+  <li>Plexo nervoso autônomo (simpático e parassimpático)</li>
+  <li><strong>Ramo genital do N. genitofemoral</strong> (L1-L2 — motor para cremaster)</li>
+  <li>Vasos linfáticos</li>
+  <li>Resquício do processo vaginal</li>
+</ul>
+<h4>Envoltórios</h4>
+Fáscia espermática interna + m. cremaster + fáscia espermática externa`},
+
+{cat:3,src:"UFC 24.2",b:"b-ufc",q:"Definir circulação porta",a:`
+<h4>Sistema Porta Hepático</h4>
+Sistema venoso que drena o sangue dos órgãos digestivos abdominais e o conduz ao fígado antes de retornar à circulação sistêmica.
+<h4>Formação da Veia Porta</h4>
+V. mesentérica superior + V. esplênica (que já recebeu a V. mesentérica inferior) = <strong>veia porta</strong>, atrás do colo do pâncreas ao nível de L2.
+<h4>Tributárias</h4>
+<ul>
+  <li>V. gástrica esquerda (coronária estomáquica)</li>
+  <li>V. gástrica direita</li>
+  <li>V. cística</li>
+  <li>V. paraumbilical</li>
+</ul>
+<h4>Importância Clínica</h4>
+Hipertensão portal → abertura de anastomoses portossistêmicas → varizes esofágicas, hemorroidas, caput medusae.`},
+
+{cat:3,src:"UFC 24.2",b:"b-ufc",q:"Ramos da aorta abdominal",a:`
+<h4>Ramos Viscerais Ímpares (ventrais)</h4>
+<table>
+  <tr><th>Ramo</th><th>Nível</th><th>Irriga</th></tr>
+  <tr><td>Tronco celíaco</td><td>T12-L1</td><td>Estômago, fígado, baço, pâncreas, duodeno proximal</td></tr>
+  <tr><td>A. mesentérica superior</td><td>L1</td><td>Intestino delgado, cólon até 2/3 do transverso</td></tr>
+  <tr><td>A. mesentérica inferior</td><td>L3</td><td>1/3 distal transverso, descendente, sigmoide, reto superior</td></tr>
+</table>
+<h4>Ramos Viscerais Pares (laterais)</h4>
+Suprarrenais médias · Renais · Gonadais (testiculares/ovarianas)
+<h4>Ramos Parietais Pares</h4>
+Frênicas inferiores · Lombares (4 pares)
+<h4>Ramo Terminal Ímpar</h4>
+A. sacral mediana — bifurca em ilíacas comuns (L4)`},
+
+{cat:3,src:"UFC 2015",b:"b-ufc",q:"Limites e constituintes anatômicos do hilo hepático",a:`
+<h4>Hilo Hepático</h4>
+Localizado na face visceral do fígado, na fissura transversa (porta hepatis).
+<h4>Limites</h4>
+<ul>
+  <li>Anterior: quadrado do fígado (lobo quadrado)</li>
+  <li>Posterior: lobo caudado (lobo de Spiegel)</li>
+  <li>Lateralmente: lobos direito e esquerdo</li>
+</ul>
+<h4>Conteúdo (Tríade Portal)</h4>
+<table>
+  <tr><th>Estrutura</th><th>Posição no ligamento hepatoduodenal</th></tr>
+  <tr><td><strong>Veia porta</strong></td><td>Posterior</td></tr>
+  <tr><td><strong>A. hepática própria</strong></td><td>Anterior esquerda</td></tr>
+  <tr><td><strong>Ducto colédoco</strong></td><td>Anterior direita</td></tr>
+</table>
+Também entram/saem pelo hilo: vasos linfáticos e nervos do plexo hepático.`},
+
+{cat:3,src:"UFC 2015",b:"b-ufc",q:"Ligamentos umbilicais e estruturas contidas neles",a:`
+<h4>Pregas (Ligamentos) Umbilicais</h4>
+<table>
+  <tr><th>Prega</th><th>Posição</th><th>Conteúdo</th></tr>
+  <tr><td><strong>Mediana</strong></td><td>Única, na linha mediana</td><td>Resquício do úraco (ligamento umbilical mediano)</td></tr>
+  <tr><td><strong>Medial</strong> (par)</td><td>Lateral à mediana</td><td>Artéria umbilical obliterada (ligamento umbilical medial)</td></tr>
+  <tr><td><strong>Lateral</strong> (par)</td><td>Mais lateral</td><td><strong>Artéria e veia epigástricas inferiores</strong> (únicas com vasos pérvios)</td></tr>
+</table>`},
+
+{cat:3,src:"UNICH 23.1",b:"b-unc",q:"Tríade portal — ordem de lateral para medial",a:`
+<h4>Tríade Portal</h4>
+Encontrada nos espaços porta do fígado (espaços de Kiernan).
+<h4>Ordem Lateral → Medial</h4>
+<strong>Ducto biliar</strong> (mais lateral) → <strong>Artéria hepática</strong> → <strong>Veia porta</strong> (mais medial/central)
+<div class="alert">Macete: DAV — Ducto · Artéria · Veia (de lateral para medial). Ou: o ducto e a artéria são menores e ficam na periferia; a veia é a maior e fica ao centro.</div>`},
+
+{cat:3,src:"UNICH 23.1",b:"b-unc",q:"Artéria epigástrica inferior — circulação colateral em caso de lesão",a:`
+<h4>Artéria Epigástrica Inferior</h4>
+Ramo da <strong>artéria ilíaca externa</strong>, origina logo acima do ligamento inguinal. Sobe medialmente para entrar na bainha do reto abdominal, anastomosa-se com a <strong>artéria epigástrica superior</strong> (ramo da torácica interna).
+<h4>Circulação Colateral</h4>
+Em caso de lesão ou coarctação da aorta, a anastomose epigástrica superior-inferior permite que o sangue da circulação sistêmica superior (subclávia → torácica interna → epigástrica superior) alcance a circulação da pelve e membros inferiores (epigástrica inferior → ilíaca externa).
+<div class="alert">Na coarctação da aorta: dilatação das artérias intercostais e epigástricas visível na radiografia (entalhes costais).</div>`},
+
+{cat:3,src:"UNICH 23.1",b:"b-unc",q:"Córtex renal — histologia",a:`
+<h4>Córtex Renal</h4>
+Região externa do rim, de coloração mais clara, contendo:
+<ul>
+  <li><strong>Corpúsculos renais (de Malpighi)</strong>: glomérulo + cápsula de Bowman</li>
+  <li><strong>Túbulo contorcido proximal (TCP)</strong>: epitélio cúbico com microvilosidades (borda em escova)</li>
+  <li><strong>Túbulo contorcido distal (TCD)</strong>: epitélio cúbico simples, sem borda em escova</li>
+  <li><strong>Parte das alças de Henle</strong> (segmento espesso)</li>
+  <li><strong>Túbulos coletores</strong> (porção cortical)</li>
+</ul>
+<h4>Colunas de Bertin</h4>
+Extensões do córtex que penetram entre as pirâmides medulares.`},
+
+{cat:3,src:"UNICH 23.2",b:"b-unc",q:"Veias hepáticas — drenagem e tributárias",a:`
+<h4>Veias Hepáticas</h4>
+Drenam o parênquima hepático e desembocam diretamente na <strong>veia cava inferior</strong>, no nível do diafragma.
+<h4>3 Veias Hepáticas Principais</h4>
+<table>
+  <tr><th>Veia</th><th>Drena</th></tr>
+  <tr><td><strong>Hepática direita</strong></td><td>Lobo direito (segmentos VI e VII principalmente)</td></tr>
+  <tr><td><strong>Hepática média</strong></td><td>Segmentos IV (lobo esquerdo medial) e V-VIII (direito)</td></tr>
+  <tr><td><strong>Hepática esquerda</strong></td><td>Lobo esquerdo (segmentos II e III) + lobo caudado (I)</td></tr>
+</table>
+<div class="alert">As veias hepáticas delimitam os segmentos de Couinaud (cirurgia hepática). Ausência de válvulas → sangue retrograda em hipertensão venosa.</div>`},
+
+{cat:3,src:"UNICH 23.2",b:"b-unc",q:"De onde vêm os grupos das artérias suprarrenais",a:`
+<h4>Artérias Suprarrenais — 3 Grupos</h4>
+<table>
+  <tr><th>Grupo</th><th>Origem</th></tr>
+  <tr><td><strong>Suprarrenal superior</strong></td><td>Artéria frênica inferior (ramo da aorta abdominal)</td></tr>
+  <tr><td><strong>Suprarrenal média</strong></td><td>Aorta abdominal diretamente</td></tr>
+  <tr><td><strong>Suprarrenal inferior</strong></td><td>Artéria renal (ipsilateral)</td></tr>
+</table>
+<div class="alert">Macete: <strong>F</strong>rênica · <strong>A</strong>orta · <strong>R</strong>enal → Superior · Média · Inferior</div>`},
+
+{cat:3,src:"UNICH 23.2",b:"b-unc",q:"Conteúdo das pregas mediana, medial e lateral do peritônio",a:`
+<h4>As Três Pregas Umbilicais</h4>
+<table>
+  <tr><th>Prega</th><th>Posição</th><th>Conteúdo</th></tr>
+  <tr><td><strong>Umbilical mediana</strong></td><td>Central única</td><td>Ligamento umbilical mediano (resquício do <strong>úraco</strong>)</td></tr>
+  <tr><td><strong>Umbilical medial</strong></td><td>Par, lateral à mediana</td><td>Ligamento umbilical medial (artéria umbilical <strong>obliterada</strong>)</td></tr>
+  <tr><td><strong>Umbilical lateral</strong></td><td>Par, mais lateral</td><td><strong>Vasos epigástricos inferiores</strong> (artéria + veia) — <em>pérvios</em></td></tr>
+</table>`},
+
+{cat:3,src:"UNICH 24.1",b:"b-unc",q:"Artéria renal direita — limites do trígono de Hesselbach",a:`
+<h4>Artéria Renal Direita</h4>
+Ramo lateral da aorta abdominal ao nível de L1-L2. A direita é mais longa, passa <strong>posterior</strong> à veia cava inferior, veia renal direita e cabeça do pâncreas.
+<h4>Trígono (Triângulo) de Hesselbach</h4>
+Define a área de fraqueza da parede posterior do canal inguinal, onde ocorrem as <strong>hérnias inguinais diretas</strong>.
+<table>
+  <tr><th>Limite</th><th>Estrutura</th></tr>
+  <tr><td>Medial</td><td>Borda lateral do músculo reto abdominal</td></tr>
+  <tr><td>Lateral</td><td>Artéria epigástrica inferior</td></tr>
+  <tr><td>Inferior</td><td>Ligamento inguinal</td></tr>
+</table>
+<div class="alert">Hérnia direta: passa medialmente à epigástrica inferior (pelo trígono). Hérnia indireta: passa lateralmente (pelo anel inguinal profundo).</div>`},
+
+{cat:3,src:"UNICH 24.1",b:"b-unc",q:"Ramificação direita da veia porta intra-hepática — circulação colateral na hipertensão portal",a:`
+<h4>Ramificação Direita da Veia Porta</h4>
+A veia porta se divide no hilo em <strong>ramo direito</strong> (curto, divide-se em anterior e posterior, irrigando segmentos V, VI, VII, VIII) e <strong>ramo esquerdo</strong> (mais longo, horizontalmente, irrigando segmentos I, II, III, IV).
+<h4>Circulação Colateral — Hipertensão Portal</h4>
+<table>
+  <tr><th>Via</th><th>Anastomose</th><th>Clínica</th></tr>
+  <tr><td>Gastroesofágica</td><td>Porta-ázigo-VCS</td><td>Varizes esofágicas</td></tr>
+  <tr><td>Umbilical</td><td>Porta-epigástricas-VCS/VCI</td><td>Caput medusae</td></tr>
+  <tr><td>Retal</td><td>Porta-VCI</td><td>Hemorroidas</td></tr>
+  <tr><td>Retroperitoneal</td><td>Porta-VCI (esplenorrenal)</td><td>Varizes retroperitoneais</td></tr>
+</table>`},
+
+{cat:3,src:"UNICH 24.1",b:"b-unc",q:"Gástrica esquerda — limites do forame omental",a:`
+<h4>Artéria Gástrica Esquerda</h4>
+Ramo do tronco celíaco. Menor dos 3 ramos. Irriga pequena curvatura do estômago (anastomosa-se com a gástrica direita) e parte do esôfago inferior. Importante via hepatofugal na hipertensão portal.
+<h4>Forame Omental (Epiploico / de Winslow)</h4>
+Abertura que comunica a bolsa omental (retrocavidade dos epíploos) com a cavidade peritoneal maior.
+<table>
+  <tr><th>Limite</th><th>Estrutura</th></tr>
+  <tr><td>Anterior</td><td>Ligamento hepatoduodenal (tríade portal)</td></tr>
+  <tr><td>Posterior</td><td>Peritônio parietal sobre VCI + pilar direito do diafragma</td></tr>
+  <tr><td>Superior</td><td>Face visceral do fígado (lobo caudado)</td></tr>
+  <tr><td>Inferior</td><td>Primeira porção do duodeno</td></tr>
+</table>`},
+
+{cat:3,src:"UNICH 25.1",b:"b-unc",q:"Cálice menor do rim — ponto de transição do ureter abdominal para pélvico",a:`
+<h4>Cálice Menor do Rim</h4>
+Estrutura que cobre diretamente as papilas renais (onde se abrem os ductos coletores). 8-18 cálices menores → agrupam-se em 2-3 <strong>cálices maiores</strong> → pelve renal → ureter.
+<h4>Ponto de Transição Ureter Abdominal → Pélvico</h4>
+O ureter cruza a <strong>bifurcação dos vasos ilíacos comuns</strong> (ao nível de L5-S1 / articulação sacroilíaca) para entrar na pelve. Este ponto é um dos <strong>3 estreitamentos fisiológicos</strong> do ureter (onde cálculos tendem a impactar):
+<ol style="padding-left:18px">
+  <li>Junção ureteropélvica (JUP)</li>
+  <li><strong>Cruzamento com os vasos ilíacos</strong> (transição abdominal-pélvica)</li>
+  <li>Entrada na bexiga (junção ureterovesical — JUV — mais estreita)</li>
+</ol>`},
+
+{cat:3,src:"UNICH 25.1",b:"b-unc",q:"Artéria suprarrenal inferior direita — grupos das artérias suprarrenais",a:`
+<h4>Artéria Suprarrenal Inferior Direita</h4>
+Ramo da <strong>artéria renal direita</strong>. Irriga o polo inferior da glândula suprarrenal (adrenal) direita.
+<h4>3 Grupos das Artérias Suprarrenais</h4>
+<table>
+  <tr><th>Grupo</th><th>Origem</th><th>Nível</th></tr>
+  <tr><td>Superior</td><td>A. frênica inferior</td><td>Diafragma</td></tr>
+  <tr><td>Média</td><td>Aorta abdominal direta</td><td>L1</td></tr>
+  <tr><td>Inferior</td><td>A. renal (ipsilateral)</td><td>L1-L2</td></tr>
+</table>
+<div class="alert">A drenagem venosa é assimétrica: V. suprarrenal direita drena direto para VCI; V. suprarrenal esquerda drena para V. renal esquerda.</div>`},
+
+// ── PELVE E PERÍNEO ───────────────────────────────────────────
+{cat:4,src:"UNICH 26.1",b:"b-unc",q:"Comissura anterior do pudendo — irrigação do ovário",a:`
+<h4>Comissura Anterior do Pudendo</h4>
+Ponto de encontro dos grandes lábios anteriormente ao clitóris. Marco do períneo feminino anterior.
+<h4>Irrigação do Ovário</h4>
+<table>
+  <tr><th>Artéria</th><th>Origem</th><th>Território</th></tr>
+  <tr><td><strong>A. ovariana</strong></td><td>Aorta abdominal (L1-L2)</td><td>Ovário (maior parte), tuba uterina (lateral), ureter</td></tr>
+  <tr><td><strong>Ramo ovariano da A. uterina</strong></td><td>A. ilíaca interna (via a. uterina)</td><td>Ovário (porção medial) — anastomosa-se com a ovariana</td></tr>
+</table>
+<div class="alert">Anastomose ovariana-uterina → importante para circulação colateral. A veia ovariana direita drena na VCI; a esquerda drena na veia renal esquerda.</div>`},
+
+{cat:4,src:"UNICH 26.1",b:"b-unc",q:"Todos os órgãos genitais internos e suas funções",a:`
+<h4>Femininos</h4>
+<table>
+  <tr><th>Órgão</th><th>Função</th></tr>
+  <tr><td>Ovários</td><td>Ovogênese, secreção de estrogênio e progesterona</td></tr>
+  <tr><td>Tubas uterinas</td><td>Captação do óvulo, local da fecundação, transporte do embrião</td></tr>
+  <tr><td>Útero</td><td>Implantação, gestação, parto</td></tr>
+  <tr><td>Vagina</td><td>Canal do parto, receptáculo do pênis, eliminação do fluxo menstrual</td></tr>
+</table>
+<h4>Masculinos</h4>
+<table>
+  <tr><th>Órgão</th><th>Função</th></tr>
+  <tr><td>Testículos</td><td>Espermatogênese, secreção de testosterona</td></tr>
+  <tr><td>Epidídimo</td><td>Maturação e armazenamento dos espermatozoides</td></tr>
+  <tr><td>Ducto deferente</td><td>Transporte dos espermatozoides</td></tr>
+  <tr><td>Vesículas seminais</td><td>Secretam frutose, prostaglandinas e proteínas coaguladoras (60-70% do sêmen)</td></tr>
+  <tr><td>Próstata</td><td>Secreção alcalina que nutre e protege espermatozoides (20-30%)</td></tr>
+  <tr><td>Glândulas bulbouretrais (Cowper)</td><td>Muco lubrificante pré-ejaculação</td></tr>
+</table>`},
+
+{cat:4,src:"UFC 24.2",b:"b-ufc",q:"8 ramos da artéria ilíaca interna",a:`
+<h4>Divisão Anterior</h4>
+<ul>
+  <li>A. umbilical → A. vesical superior (bexiga) + A. do ducto deferente</li>
+  <li>A. vesical inferior (bexiga, próstata, vesícula seminal)</li>
+  <li>A. uterina (útero, tuba, ovário) / A. vaginal</li>
+  <li>A. retal média</li>
+  <li>A. pudenda interna (períneo, genitais externos, reto inferior)</li>
+  <li>A. obturatória (compartimento medial da coxa)</li>
+</ul>
+<h4>Divisão Posterior</h4>
+<ul>
+  <li>A. iliolumbar</li>
+  <li>Aa. sacrais laterais</li>
+  <li>A. glútea superior (maior ramo — compartimento glúteo)</li>
+  <li>A. glútea inferior</li>
+</ul>`},
+
+{cat:4,src:"UFC 2015",b:"b-ufc",q:"Partes da tuba uterina",a:`
+<h4>4 Partes da Tuba Uterina (medial → lateral)</h4>
+<table>
+  <tr><th>Parte</th><th>Local</th><th>Característica</th></tr>
+  <tr><td><strong>Parte uterina (intramural)</strong></td><td>Dentro da parede uterina</td><td>Menor, mais estreita</td></tr>
+  <tr><td><strong>Istmo</strong></td><td>Próximo ao útero</td><td>Mais estreito, paredes espessas — local de ligadura tubária</td></tr>
+  <tr><td><strong>Ampola</strong></td><td>Porção média</td><td>Mais longa e larga — <em>local da fecundação</em></td></tr>
+  <tr><td><strong>Infundíbulo</strong></td><td>Extremidade distal</td><td>Em forma de funil, com fímbrias — a fímbria ovárica é a maior</td></tr>
+</table>`},
+
+{cat:4,src:"UFC 2015",b:"b-ufc",q:"Plexo lombar — formação e ramos",a:`
+<h4>Formação</h4>
+Raízes: <strong>T12 (parcial), L1, L2, L3, L4</strong> (parcial) — dentro do músculo psoas maior.
+<h4>Ramos</h4>
+<table>
+  <tr><th>Nervo</th><th>Raízes</th><th>Território motor/sensitivo</th></tr>
+  <tr><td>N. iliohipogástrico</td><td>L1 (T12)</td><td>Oblíquos inf. / pele inguinal e hipogástrica</td></tr>
+  <tr><td>N. ilioinguinal</td><td>L1</td><td>Oblíquos / pele escroto/lábio maior, raiz do pênis/clitóris</td></tr>
+  <tr><td>N. genitofemoral</td><td>L1, L2</td><td>M. cremaster / escroto + face anterior coxa</td></tr>
+  <tr><td>N. cutâneo lateral da coxa</td><td>L2, L3</td><td>Apenas sensitivo — face lateral da coxa</td></tr>
+  <tr><td><strong>N. femoral</strong></td><td>L2, L3, L4</td><td>Quadríceps, sartório, ilíaco / face anterior coxa + perna medial (n. safeno)</td></tr>
+  <tr><td><strong>N. obturatório</strong></td><td>L2, L3, L4</td><td>Adutores da coxa / face medial da coxa</td></tr>
+  <tr><td>Tronco lombossacral</td><td>L4, L5</td><td>Contribui para o plexo sacral</td></tr>
+</table>`},
+
+{cat:4,src:"UNICH 23.1",b:"b-unc",q:"Fórnice vaginal — localização e limites",a:`
+<h4>Fórnice Vaginal</h4>
+Recessos anulares formados pela vagina ao redor do colo do útero (cérvix).
+<h4>Divisões</h4>
+<table>
+  <tr><th>Porção</th><th>Relações Anatômicas</th></tr>
+  <tr><td><strong>Posterior</strong> (mais profunda)</td><td>Relaciona-se com a escavação rectouterina (fundo de saco de Douglas) — importante acesso cirúrgico e culdocentese</td></tr>
+  <tr><td><strong>Anterior</strong></td><td>Relaciona-se com a base da bexiga e uretra</td></tr>
+  <tr><td><strong>Laterais</strong> (dir. e esq.)</td><td>Relacionam-se com os ureteres e vasos uterinos</td></tr>
+</table>`},
+
+{cat:4,src:"UNICH 23.1",b:"b-unc",q:"Glândula seminal — o que desemboca nela",a:`
+<h4>Vesícula Seminal (Glândula Seminal)</h4>
+Glândula par, localizada posterior à bexiga e superior à próstata.
+<h4>O Que Desemboca</h4>
+<ul>
+  <li>O ducto da vesícula seminal + o ducto deferente (ampola) se unem para formar o <strong>ducto ejaculatório</strong></li>
+  <li>Os ductos ejaculatórios (direito e esquerdo) atravessam a próstata e desembocam na <strong>uretra prostática</strong> no colículo seminal (verumontanum)</li>
+</ul>
+<h4>Função</h4>
+Secreta ~60-70% do volume do sêmen: frutose (nutrição), prostaglandinas, proteínas de coagulação.`},
+
+{cat:4,src:"UNICH 23.2",b:"b-unc",q:"Reto — anatomia e relações",a:`
+<h4>Reto</h4>
+Porção terminal do intestino grosso. Começa ao nível de S3 (junção retossigmoidiana) e termina no canal anal.
+<h4>Flexuras</h4>
+<ul>
+  <li>Flexura sacral (segue a curvatura do sacro)</li>
+  <li>Flexura perineal (curva posterior ao cruzar o diafragma pélvico)</li>
+  <li>Flexuras laterais (3)</li>
+</ul>
+<h4>Relações</h4>
+<table>
+  <tr><th>Parede</th><th>Relações</th></tr>
+  <tr><td>Anterior (masc.)</td><td>Bexiga, próstata, vesículas seminais, ductos deferentes, uretra</td></tr>
+  <tr><td>Anterior (fem.)</td><td>Útero e vagina (escavação rectouterina)</td></tr>
+  <tr><td>Posterior</td><td>Sacro, cóccix, vasos sacrais, n. sacral</td></tr>
+</table>`},
+
+{cat:4,src:"UNICH 24.1",b:"b-unc",q:"Óstio do cérvix uterino — músculos do assoalho pélvico e inervação",a:`
+<h4>Óstio do Cérvix</h4>
+Abertura do canal cervical no útero (óstio interno) e na vagina (óstio externo). Em nulíparas: circular; em multíparas: transversal.
+<h4>Músculos do Assoalho Pélvico (Diafragma Pélvico)</h4>
+<table>
+  <tr><th>Músculo</th><th>Inervação</th></tr>
+  <tr><td><strong>Levantador do ânus</strong> (puborretal, pubococcígeo, iliococcígeo)</td><td>N. levantador do ânus (S3-S4) + ramo perineal do pudendo</td></tr>
+  <tr><td><strong>Coccígeo (isquiococcígeo)</strong></td><td>N. coccígeo (S4-S5)</td></tr>
+</table>
+<h4>Membranas do Períneo (abaixo do diafragma pélvico)</h4>
+<ul>
+  <li>M. transverso profundo do períneo + m. esfíncter externo da uretra → diafragma urogenital</li>
+  <li>Inervação: ramo perineal do N. pudendo (S2-S4)</li>
+</ul>`},
+
+{cat:4,src:"UNICH 24.1",b:"b-unc",q:"Artéria umbilical — pelo menos 8 ramos da ilíaca interna",a:`
+<h4>Artéria Umbilical</h4>
+Ramo da divisão anterior da ilíaca interna. No feto: transporta sangue fetal desoxigenado para a placenta. Após o nascimento: oblitéra-se distalmente → ligamento umbilical medial. Proximalmente: permanece pérvia como a <strong>artéria vesical superior</strong>.
+<h4>8 Ramos da Artéria Ilíaca Interna</h4>
+<strong>Divisão anterior:</strong> Umbilical (→ vesical superior) · Vesical inferior · Uterina/vaginal · Retal média · Pudenda interna · Obturatória · Glútea inferior<br>
+<strong>Divisão posterior:</strong> Iliolumbar · Sacrais laterais · <strong>Glútea superior</strong>`},
+
+{cat:4,src:"UNICH 24.1",b:"b-unc",q:"Ducto deferente — limites do canal inguinal",a:`
+<h4>Ducto Deferente</h4>
+Conduz espermatozoides do epidídimo à uretra prostática. Percorre o canal inguinal como componente do funículo espermático, cruza os vasos ilíacos externos, desce na pelve, dilata-se na <strong>ampola</strong>, une-se à vesícula seminal → ducto ejaculatório.
+<h4>Limites do Canal Inguinal</h4>
+<table>
+  <tr><th>Parede</th><th>Estrutura</th></tr>
+  <tr><td>Anterior</td><td>Aponeurose do oblíquo externo (toda extensão) + oblíquo interno (1/3 lateral)</td></tr>
+  <tr><td>Posterior</td><td>Fáscia transversal (toda extensão) + tendão conjunto (1/3 medial)</td></tr>
+  <tr><td>Superior (teto)</td><td>Fibras arqueadas do oblíquo interno + transverso</td></tr>
+  <tr><td>Inferior (assoalho)</td><td>Ligamento inguinal + ligamento lacunar (medialmente)</td></tr>
+  <tr><td>Abertura medial</td><td>Anel inguinal superficial (na aponeurose do oblíquo externo)</td></tr>
+  <tr><td>Abertura lateral</td><td>Anel inguinal profundo (na fáscia transversal)</td></tr>
+</table>`},
+
+{cat:4,src:"UNICH 25.1",b:"b-unc",q:"Artéria sacral lateral — hérnia inguinal congênita",a:`
+<h4>Artéria Sacral Lateral</h4>
+Ramo da divisão posterior da ilíaca interna. Par (superior e inferior). Entra pelos forames sacrais pélvicos, irriga o sacro, raízes nervosas sacrais, m. piriforme.
+<h4>Hérnia Inguinal Congênita</h4>
+<ul>
+  <li>Ocorre por persistência (não obliteração) do <strong>processo vaginal do peritônio</strong> (canal peritôneo-vaginal)</li>
+  <li>Durante o desenvolvimento: o testículo desce retroperitonealmente arrastando o processo vaginal</li>
+  <li>Normalmente: o processo vaginal se fecha após a descida testicular</li>
+  <li>Se persistir: o conteúdo abdominal pode herniá-lo → hérnia inguinal indireta congênita</li>
+  <li>Sempre indireta (passa pelo anel inguinal profundo e lateral à epigástrica inferior)</li>
+</ul>`},
+
+{cat:4,src:"UNICH 25.1",b:"b-unc",q:"Todos os ligamentos do útero",a:`
+<h4>Ligamentos do Útero</h4>
+<table>
+  <tr><th>Ligamento</th><th>Trajeto</th><th>Função/Conteúdo</th></tr>
+  <tr><td><strong>Largo</strong> (mesométrio)</td><td>Útero → parede lateral da pelve</td><td>Peritônio em dupla folha; contém tubas, ovários, vasos</td></tr>
+  <tr><td><strong>Redondo</strong></td><td>Corno uterino → anel inguinal profundo → grande lábio</td><td>Mantém anteversão; contém fibras musculares lisas</td></tr>
+  <tr><td><strong>Cardinal</strong> (Mackenrodt)</td><td>Cérvix → parede lateral pélvica</td><td>Principal suporte do útero; contém A. uterina e ureter</td></tr>
+  <tr><td><strong>Uterossacral</strong></td><td>Cérvix → sacro</td><td>Suporte posterior; contém fibras nervosas autonômicas</td></tr>
+  <tr><td><strong>Pubocervical</strong></td><td>Cérvix → púbis</td><td>Suporte anterior</td></tr>
+</table>
+<div class="alert">Macete dos ligamentos de suporte: <strong>C</strong>ardinal · <strong>U</strong>terossacral · <strong>P</strong>ubocervical = C U P (sustentam o cérvix)</div>`},
+
+{cat:4,src:"UNICH 25.1",b:"b-unc",q:"Sulco balanoprepucial — formação da raiz do pênis",a:`
+<h4>Sulco Balanoprepucial</h4>
+Sulco circular que separa a glande do pênis do prepúcio. Nele localizam-se as <strong>glândulas prepuciais</strong> (de Tyson), que secretam o esmegma.
+<h4>Formação da Raiz do Pênis</h4>
+A raiz do pênis é a porção fixa, ancorada ao períneo, formada por 3 corpos eréteis:
+<ul>
+  <li><strong>Bulbo do pênis</strong>: parte proximal do corpo esponjoso, coberto pelo músculo bulboesponjoso, fixado à membrana perineal</li>
+  <li><strong>Crura do pênis</strong> (par): partes proximais dos corpos cavernosos, cobertas pelos músculos isquiocavernosos, fixadas nos ramos isquiopúbicos</li>
+</ul>
+<h4>Inervação e Vascularização da Raiz</h4>
+<ul>
+  <li>A. pudenda interna → A. do bulbo + Aa. profundas do pênis + A. dorsal do pênis</li>
+  <li>N. pudendo → ramo perineal + N. dorsal do pênis</li>
+</ul>`},
+
+// ── MEMBRO SUPERIOR ──────────────────────────────────────────
+{cat:5,src:"UNICH 26.1",b:"b-unc",q:"Processo coronóide da ulna — músculo que se insere, origem, ação e inervação",a:`
+<h4>Processo Coronóide da Ulna</h4>
+Projeção anterior da ulna proximal, que encaixa na fossa coronóide do úmero na flexão.
+<h4>Músculo Inserido: Braquial</h4>
+<table>
+  <tr><th></th><th></th></tr>
+  <tr><td><strong>Origem</strong></td><td>Face anterior do úmero (metade distal)</td></tr>
+  <tr><td><strong>Inserção</strong></td><td>Tuberosidade e processo coronóide da ulna</td></tr>
+  <tr><td><strong>Ação</strong></td><td>Flexão do antebraço (em todas as posições — músculo puro flexor)</td></tr>
+  <tr><td><strong>Inervação</strong></td><td>N. musculocutâneo (C5-C6) — porção lateral pelo radial (C7)</td></tr>
+</table>
+<div class="alert">Também se insere no coronóide o músculo pronador redondo (N. mediano) — porção ulnar.</div>`},
+
+{cat:5,src:"UNICH 26.1",b:"b-unc",q:"N. Interósseo anterior — formação e ramos dos arcos palmares superficial e profundo",a:`
+<h4>Nervo Interósseo Anterior</h4>
+Ramo do <strong>nervo mediano</strong> que emerge ~5 cm distal ao epicôndilo medial. Motor puro. Inerva: flexor longo do polegar, metade lateral do flexor profundo dos dedos (2º e 3º dedos) e pronador quadrado. Lesão: incapacidade de pinça (sinal da bênção entre polegar e indicador).
+<h4>Arco Palmar Superficial</h4>
+<ul>
+  <li>Formado principalmente pela <strong>A. ulnar</strong> + anastomose com a A. palmar superficial (ramo da radial)</li>
+  <li>Convexidade voltada para os dedos ao nível da prega palmar distal</li>
+  <li>Emite <strong>Aa. digitais palmares comuns</strong> (3) → Aa. digitais palmares próprias</li>
+</ul>
+<h4>Arco Palmar Profundo</h4>
+<ul>
+  <li>Formado principalmente pela <strong>A. radial</strong> (ramo palmar profundo) + anastomose com o ramo profundo da ulnar</li>
+  <li>Mais profundo (sob os tendões flexores)</li>
+  <li>Emite <strong>Aa. metacarpais palmares</strong> (3)</li>
+</ul>`},
+
+{cat:5,src:"UFC 24.2",b:"b-ufc",q:"Posição da mão na lesão do N. Radial, Ulnar e Mediano",a:`
+<h4>Lesão do Nervo Radial</h4>
+<strong>Mão em gota</strong> (wrist drop): impossibilidade de extensão do punho e dedos. Lesão alta (espiral do úmero): paralisia de todos os extensores + braquiorradial + supinador.
+<h4>Lesão do Nervo Ulnar</h4>
+<strong>Mão em garra ulnar</strong> (claw hand): hiperextensão das MCF + flexão das IF do 4º e 5º dedos (paralisia dos interósseos e lumbricais 3 e 4). Atrofia da eminência hipotenar. Sinal de Froment positivo (flexão do polegar com pinça).
+<h4>Lesão do Nervo Mediano</h4>
+<strong>Mão de pregador (benedição)</strong>: lesão alta → incapacidade de flexão dos dedos 1, 2, 3 e do polegar; lesão baixa (síndrome do túnel do carpo) → atrofia da eminência tenar, fraqueza de oponência e abdução do polegar. Déficit sensitivo na palma radial e 3,5 dedos laterais.`},
+
+{cat:5,src:"UFC 24.2",b:"b-ufc",q:"Origem, inserção e ação do M. Flexor ulnar do carpo",a:`
+<h4>M. Flexor Ulnar do Carpo</h4>
+<table>
+  <tr><th></th><th></th></tr>
+  <tr><td><strong>Origem</strong></td><td>Cabeça umeral: epicôndilo medial; Cabeça ulnar: olécrano e borda posterior da ulna (2/3 sup.)</td></tr>
+  <tr><td><strong>Inserção</strong></td><td>Osso pisiforme → ligamento pisiohamato → base do 5º metacarpo</td></tr>
+  <tr><td><strong>Ação</strong></td><td>Flexão e <strong>desvio ulnar</strong> do punho</td></tr>
+  <tr><td><strong>Inervação</strong></td><td><strong>N. Ulnar</strong> (C7-C8-T1)</td></tr>
+</table>
+<div class="alert">O único músculo do antebraço inervado exclusivamente pelo nervo ulnar (os demais são mediano ou radial).</div>`},
+
+{cat:5,src:"UFC 24.2",b:"b-ufc",q:"Formação e ramos dos arcos palmar superficial e profundo",a:`
+<h4>Arco Palmar Superficial</h4>
+<strong>Formação:</strong> A. ulnar (dominant) + A. palmar superficial (ramo da radial)<br>
+<strong>Ramos:</strong> 3 Aa. digitais palmares comuns → dividem-se em Aa. digitais palmares próprias (bordas dos dedos 2-5)
+<h4>Arco Palmar Profundo</h4>
+<strong>Formação:</strong> A. radial (dominant — ramo palmar profundo) + ramo palmar profundo da ulnar<br>
+<strong>Ramos:</strong> 3 Aa. metacarpais palmares → anastomosam com as aa. digitais palmares comuns
+<div class="alert">Macete: Superficial = Ulnar-dominante | Profundo = Radial-dominante</div>`},
+
+{cat:5,src:"UFC 24.2",b:"b-ufc",q:"Origem, inserção e ação dos músculos do braço",a:`
+<h4>Compartimento Anterior (Flexores)</h4>
+<table>
+  <tr><th>Músculo</th><th>Origem</th><th>Inserção</th><th>Ação</th><th>Nervo</th></tr>
+  <tr><td>Bíceps braquial</td><td>Cabeça curta: processo coracoide; Cabeça longa: tubérculo supraglenoidal</td><td>Tuberosidade radial + aponeurose bicipital</td><td>Flexão do cotovelo + supinação (principal supinador)</td><td>Musculocutâneo</td></tr>
+  <tr><td>Braquial</td><td>Face anterior do úmero (½ distal)</td><td>Tuberosidade + coronóide da ulna</td><td>Flexão do antebraço</td><td>Musculocutâneo (+ radial lateral)</td></tr>
+  <tr><td>Coracobraquial</td><td>Processo coracoide</td><td>Face medial do úmero</td><td>Flexão + adução do braço</td><td>Musculocutâneo</td></tr>
+</table>
+<h4>Compartimento Posterior (Extensores)</h4>
+<table>
+  <tr><th>Músculo</th><th>Origem</th><th>Inserção</th><th>Ação</th><th>Nervo</th></tr>
+  <tr><td>Tríceps (3 cabeças)</td><td>Longa: tubérculo infraglenoidal; Lateral e medial: face posterior do úmero</td><td>Olécrano da ulna</td><td>Extensão do cotovelo (principal)</td><td>Radial</td></tr>
+</table>`},
+
+{cat:5,src:"UFC 2015",b:"b-ufc",q:"Todos os músculos inervados pelo nervo radial",a:`
+<h4>N. Radial — Músculos Inervados</h4>
+<strong>No braço (antes da bifurcação):</strong>
+<ul>
+  <li>Tríceps braquial (todas as cabeças)</li>
+  <li>Ancôneo</li>
+  <li>Braquiorradial</li>
+  <li>Extensor radial longo do carpo</li>
+</ul>
+<strong>Via N. Interósseo Posterior (ramo profundo do radial):</strong>
+<ul>
+  <li>Extensor radial curto do carpo</li>
+  <li>Supinador</li>
+  <li>Extensor dos dedos</li>
+  <li>Extensor do dedo mínimo</li>
+  <li>Extensor ulnar do carpo</li>
+  <li>Abdutor longo do polegar</li>
+  <li>Extensor curto do polegar</li>
+  <li>Extensor longo do polegar</li>
+  <li>Extensor do indicador</li>
+</ul>
+<div class="alert">Macete: O radial inerva todos os EXTENSORES + supinador + braquiorradial.</div>`},
+
+{cat:5,src:"UFC 2015",b:"b-ufc",q:"Músculos do manguito rotador — inervação e ação",a:`
+<h4>SITS — 4 Músculos do Manguito Rotador</h4>
+<table>
+  <tr><th>Músculo</th><th>Inserção</th><th>Ação</th><th>Nervo</th></tr>
+  <tr><td><strong>S</strong>upraespinal</td><td>Faceta superior do tubérculo maior</td><td>Abdução inicial (0-15°) + estabilização</td><td>N. supraescapular (C5-C6)</td></tr>
+  <tr><td><strong>I</strong>nfraespinal</td><td>Faceta média do tubérculo maior</td><td>Rotação lateral (externa)</td><td>N. supraescapular (C5-C6)</td></tr>
+  <tr><td><strong>T</strong>eres minor</td><td>Faceta inferior do tubérculo maior</td><td>Rotação lateral + adução</td><td>N. axilar (C5-C6)</td></tr>
+  <tr><td><strong>S</strong>ubescapular</td><td>Tubérculo menor</td><td>Rotação medial (interna) — único anterior</td><td>Nn. subescapulares (C5-C6)</td></tr>
+</table>
+<div class="alert">Macete: <strong>SITS</strong> — Supraespinal · Infraespinal · Teres minor · Subescapular</div>`},
+
+{cat:5,src:"UFC 2015",b:"b-ufc",q:"Ramos diretos dos troncos do plexo braquial",a:`
+<h4>Ramos Diretos dos Troncos</h4>
+<table>
+  <tr><th>Tronco</th><th>Ramo direto</th><th>Músculo inervado</th></tr>
+  <tr><td><strong>Superior</strong> (C5-C6)</td><td>N. supraescapular</td><td>Supraespinal + Infraespinal</td></tr>
+  <tr><td><strong>Superior</strong> (C5-C6)</td><td>N. para subclávio</td><td>M. subclávio</td></tr>
+  <tr><td>Médio e Inferior</td><td>Sem ramos diretos significativos</td><td>—</td></tr>
+</table>
+<div class="alert">Os demais ramos surgem das divisões e dos fascículos (lateral, posterior, medial), não diretamente dos troncos.</div>`},
+
+{cat:5,src:"UNICH 23.1",b:"b-unc",q:"Túnel do carpo — conteúdo",a:`
+<h4>Túnel do Carpo</h4>
+Canal osteofibrótico no punho, formado pelos ossos do carpo (assoalho e paredes) e pelo <strong>retináculo dos flexores</strong> (teto).
+<h4>Conteúdo (9 tendões + 1 nervo)</h4>
+<ul>
+  <li><strong>Tendões do flexor superficial dos dedos</strong> (4 tendões)</li>
+  <li><strong>Tendões do flexor profundo dos dedos</strong> (4 tendões)</li>
+  <li><strong>Tendão do flexor longo do polegar</strong> (1 tendão)</li>
+  <li><strong>Nervo mediano</strong></li>
+</ul>
+<div class="alert">A artéria ulnar e o nervo ulnar NÃO passam pelo túnel do carpo — percorrem o canal de Guyon (medialmente).</div>`},
+
+{cat:5,src:"UNICH 23.2",b:"b-unc",q:"Ramo dorsal do nervo ulnar — trajeto e território",a:`
+<h4>Ramo Dorsal do N. Ulnar</h4>
+<ul>
+  <li>Origina do N. Ulnar ~5 cm proximal ao punho</li>
+  <li>Passa dorsal ao tendão do flexor ulnar do carpo</li>
+  <li>Contorna a borda medial do punho para o dorso da mão</li>
+  <li><strong>Território sensitivo</strong>: face dorsal da mão (metade ulnar) + face dorsal dos dedos 4 e 5 e metade ulnar do 3º dedo (até as articulações IFP)</li>
+</ul>`},
+
+{cat:5,src:"UNICH 23.2",b:"b-unc",q:"Retorno venoso superficial do membro superior — onde começa",a:`
+<h4>Sistema Venoso Superficial</h4>
+Inicia-se na rede venosa dorsal da mão (plexo venoso dorsal).
+<table>
+  <tr><th>Veia</th><th>Origem</th><th>Trajeto</th><th>Drenagem</th></tr>
+  <tr><td><strong>Cefálica</strong></td><td>Borda lateral da rede dorsal</td><td>Face lateral do antebraço → braço → sulco deltopeitoral</td><td>V. axilar (via v. cefálica acessória → v. axilar)</td></tr>
+  <tr><td><strong>Basílica</strong></td><td>Borda medial da rede dorsal</td><td>Face medial antebraço → fossa cubital → braço medial</td><td>V. axilar (perfura a fáscia braquial)</td></tr>
+  <tr><td><strong>Mediana do antebraço</strong></td><td>Face anterior do antebraço</td><td>Ascende medialmente</td><td>V. mediana cubital (conecta cefálica-basílica)</td></tr>
+</table>
+<div class="alert">V. mediana cubital: local de venopunção. Separa o n. mediano (medial) do tendão do bíceps (lateral).</div>`},
+
+{cat:5,src:"UNICH 24.1",b:"b-unc",q:"Osso pisiforme — músculo que se insere, origem, inervação e ação",a:`
+<h4>Osso Pisiforme</h4>
+Osso sesamoide da fileira proximal do carpo, na borda ulnar. Artícula com o piramidal.
+<h4>Músculo Inserido: Flexor Ulnar do Carpo</h4>
+<table>
+  <tr><th></th><th></th></tr>
+  <tr><td><strong>Origem</strong></td><td>Epicôndilo medial (cabeça umeral) + olécrano e ulna posterior (cabeça ulnar)</td></tr>
+  <tr><td><strong>Inserção</strong></td><td>Osso pisiforme (funciona como sesamoide para o tendão)</td></tr>
+  <tr><td><strong>Ação</strong></td><td>Flexão e desvio ulnar do punho</td></tr>
+  <tr><td><strong>Inervação</strong></td><td><strong>N. Ulnar</strong> (C7-C8)</td></tr>
+</table>`},
+
+{cat:5,src:"UNICH 24.1",b:"b-unc",q:"Divisão posterior do tronco inferior — todos os ramos do plexo braquial",a:`
+<h4>Tronco Inferior (C8-T1)</h4>
+Divisão anterior → contribui para o fascículo medial<br>
+<strong>Divisão posterior</strong> → contribui para o fascículo posterior
+<h4>Todos os Ramos do Plexo Braquial</h4>
+<strong>Ramos dos troncos (diretos):</strong>
+<ul>
+  <li>N. supraescapular (tronco superior)</li>
+  <li>N. para o subclávio (tronco superior)</li>
+</ul>
+<strong>Ramos dos fascículos:</strong>
+<table>
+  <tr><th>Fascículo</th><th>Ramos</th></tr>
+  <tr><td>Lateral</td><td>N. musculocutâneo · N. peitoral lateral · Raiz lateral do mediano</td></tr>
+  <tr><td>Medial</td><td>N. ulnar · N. cutâneo medial do braço · N. cutâneo medial do antebraço · N. peitoral medial · Raiz medial do mediano</td></tr>
+  <tr><td>Posterior</td><td>N. axilar · N. radial · N. toracodorsal · N. subescapular superior · N. subescapular inferior</td></tr>
+</table>`},
+
+{cat:5,src:"UNICH 25.1",b:"b-unc",q:"Nervo ulnar — anastomose do cotovelo",a:`
+<h4>N. Ulnar (C8-T1)</h4>
+Origina do fascículo medial. Percorre o compartimento anterior do braço, passa pelo <strong>sulco do nervo ulnar</strong> (goteira epitroclear) no epicôndilo medial → antebraço → canal de Guyon no punho → mão.
+<h4>Anastomose do Cotovelo</h4>
+A <strong>rede anastomótica do cotovelo</strong> conecta ramos das artérias radial e ulnar para garantir circulação colateral:
+<ul>
+  <li>A. colateral ulnar superior e inferior (do úmero/braquial) + A. recorrente ulnar anterior e posterior</li>
+  <li>A. colateral radial e média (braquial profunda) + A. recorrente radial e interóssea recorrente</li>
+</ul>
+Importância: preserva vascularização distal mesmo com ligaduras de vasos proximais.`},
+
+{cat:5,src:"UNICH 25.1",b:"b-unc",q:"Pisiforme — músculo que se insere, inervação e ação",a:`
+<h4>Pisiforme — Inserção Muscular</h4>
+O <strong>Flexor Ulnar do Carpo</strong> insere-se no pisiforme (que funciona como osso sesamoide do seu tendão). O pisiforme serve ainda como origem para o <strong>abdutor do dedo mínimo</strong>.
+<table>
+  <tr><th></th><th>Flexor Ulnar do Carpo</th></tr>
+  <tr><td>Inervação</td><td>N. Ulnar (C7-C8)</td></tr>
+  <tr><td>Ação principal</td><td>Flexão + desvio ulnar do punho</td></tr>
+</table>`},
+
+// ── MEMBRO INFERIOR ──────────────────────────────────────────
+{cat:6,src:"UNICH 26.1",b:"b-unc",q:"Tuberosidade do 5º metatarso — músculo que se insere, origem, ação e inervação",a:`
+<h4>Tuberosidade do 5º Metatarso</h4>
+Projeção óssea na base lateral do 5º metatarso (facilmente palpável). Local de inserção do fibular curto (peroneiro curto).
+<h4>Músculo Fibular Curto (Peroneiro Curto)</h4>
+<table>
+  <tr><th></th><th></th></tr>
+  <tr><td><strong>Origem</strong></td><td>Face lateral da fíbula (2/3 inferiores)</td></tr>
+  <tr><td><strong>Inserção</strong></td><td>Tuberosidade da base do 5º metatarso</td></tr>
+  <tr><td><strong>Ação</strong></td><td>Eversão do pé + flexão plantar (secundária)</td></tr>
+  <tr><td><strong>Inervação</strong></td><td>N. fibular superficial (L5-S1)</td></tr>
+</table>
+<div class="alert">Fratura por avulsão da tuberosidade do 5º metatarso (fratura do "dancer") → tração do tendão do fibular curto em inversão forçada.</div>`},
+
+{cat:6,src:"UNICH 26.1",b:"b-unc",q:"N. Safeno — raízes e ramos terminais do plexo lombar",a:`
+<h4>Nervo Safeno</h4>
+Maior ramo sensitivo do <strong>nervo femoral</strong> (L3-L4). Apenas sensitivo. Acompanha a artéria femoral no canal dos adutores (canal de Hunter), emerge no joelho, desce medialmente à perna e dorso medial do pé.
+Sensitivo: face medial da perna e dorso medial do pé.
+<h4>Plexo Lombar — Raízes e Ramos Terminais</h4>
+<strong>Raízes:</strong> T12 (parcial), L1, L2, L3, L4 (parcial)
+<table>
+  <tr><th>Ramo</th><th>Raízes</th></tr>
+  <tr><td>N. iliohipogástrico</td><td>L1 (T12)</td></tr>
+  <tr><td>N. ilioinguinal</td><td>L1</td></tr>
+  <tr><td>N. genitofemoral</td><td>L1-L2</td></tr>
+  <tr><td>N. cutâneo lateral da coxa</td><td>L2-L3</td></tr>
+  <tr><td><strong>N. femoral</strong></td><td>L2-L3-L4</td></tr>
+  <tr><td><strong>N. obturatório</strong></td><td>L2-L3-L4</td></tr>
+  <tr><td>Tronco lombossacral</td><td>L4-L5</td></tr>
+</table>`},
+
+{cat:6,src:"UFC 24.2",b:"b-ufc",q:"Lesão do nervo obturatório — comprometimento motor e sensitivo",a:`
+<h4>Nervo Obturatório (L2-L3-L4)</h4>
+Emerge medialmente ao psoas, entra na coxa pelo forame obturador, divide-se em ramos anterior e posterior.
+<h4>Comprometimento Após Lesão</h4>
+<table>
+  <tr><th>Função</th><th>Déficit</th></tr>
+  <tr><td><strong>Motor</strong></td><td>Fraqueza dos adutores da coxa (grácil, adutor longo, curto, magno — parte), obturador externo → dificuldade de adução e rotação medial da coxa</td></tr>
+  <tr><td><strong>Sensitivo</strong></td><td>Perda de sensibilidade na <strong>face medial da coxa</strong></td></tr>
+  <tr><td><strong>Marcha</strong></td><td>Marcha com pernas abertas (tesoura invertida), instabilidade</td></tr>
+</table>
+<div class="alert">Lesão comum em: parto (cabeça fetal sobre o nervo), cirurgia pélvica, hérnia obturatória.</div>`},
+
+{cat:6,src:"UFC 24.2",b:"b-ufc",q:"Inervação da perna — todos os nervos por compartimento",a:`
+<h4>Inervação dos Compartimentos da Perna</h4>
+<table>
+  <tr><th>Compartimento</th><th>Nervo</th><th>Músculos</th></tr>
+  <tr><td><strong>Anterior</strong></td><td>N. fibular profundo (L4-L5)</td><td>Tibial anterior, extensor longo dos dedos, extensor longo do hálux, fibular terceiro</td></tr>
+  <tr><td><strong>Lateral</strong></td><td>N. fibular superficial (L5-S1)</td><td>Fibular longo, fibular curto</td></tr>
+  <tr><td><strong>Posterior superficial</strong></td><td>N. tibial (S1-S2)</td><td>Gastrocnêmio, sóleo, plantar</td></tr>
+  <tr><td><strong>Posterior profundo</strong></td><td>N. tibial (L4-S2)</td><td>Flexor longo dos dedos, flexor longo do hálux, tibial posterior, poplíteo</td></tr>
+</table>`},
+
+{cat:6,src:"UFC 2015",b:"b-ufc",q:"Comprometimento na lesão do nervo fibular profundo",a:`
+<h4>N. Fibular Profundo (L4-L5)</h4>
+Inerva os músculos do compartimento anterior da perna + músculos do dorso do pé.
+<h4>Lesão — Comprometimento</h4>
+<ul>
+  <li><strong>Motor</strong>: paralisia dos dorsiflexores do pé e extensores dos dedos → <strong>pé caído</strong> (foot drop)</li>
+  <li><strong>Marcha</strong>: marcha escarvante (steppage gait) — eleva excessivamente o joelho para compensar o arrasto do pé</li>
+  <li><strong>Sensitivo</strong>: perda da sensibilidade apenas no <strong>1º espaço interdigital</strong> (entre 1º e 2º dedos)</li>
+</ul>
+<div class="alert">Causa comum: compressão pelo retináculo dos extensores, fratura da cabeça da fíbula, uso prolongado de curativo gessado.</div>`},
+
+{cat:6,src:"UFC 2015",b:"b-ufc",q:"Irrigação de cada compartimento da perna e seus ramos no pé",a:`
+<h4>Irrigação dos Compartimentos</h4>
+<table>
+  <tr><th>Compartimento</th><th>Artéria</th><th>Origem</th></tr>
+  <tr><td>Anterior</td><td>A. tibial anterior</td><td>A. poplítea (bifurca no anel do sóleo)</td></tr>
+  <tr><td>Lateral</td><td>Ramos fibulares (peroneiros)</td><td>A. fibular (peroneira) — ramo da tibial posterior</td></tr>
+  <tr><td>Posterior</td><td>A. tibial posterior + A. fibular</td><td>A. poplítea</td></tr>
+</table>
+<h4>Ramos no Pé</h4>
+<ul>
+  <li>A. tibial anterior → <strong>A. dorsal do pé</strong> → arco dorsal do pé → Aa. metatarsais dorsais</li>
+  <li>A. tibial posterior → contorna o maléolo medial → <strong>Aa. plantar medial e lateral</strong> → A. plantar lateral forma o <strong>arco plantar profundo</strong></li>
+</ul>`},
+
+{cat:6,src:"UFC 2015",b:"b-ufc",q:"Limites e conteúdos do trígono femoral",a:`
+<h4>Trígono (Triângulo) Femoral</h4>
+<h4>Limites</h4>
+<table>
+  <tr><th>Limite</th><th>Estrutura</th></tr>
+  <tr><td>Superior (base)</td><td>Ligamento inguinal</td></tr>
+  <tr><td>Lateral</td><td>Borda medial do sartório</td></tr>
+  <tr><td>Medial</td><td>Borda lateral do adutor longo</td></tr>
+  <tr><td>Teto</td><td>Fáscia lata + fáscia cribriforme (sobre o hiato safeno)</td></tr>
+  <tr><td>Assoalho</td><td>Ilíopsoas (lateral) + pectíneo (medial)</td></tr>
+</table>
+<h4>Conteúdo (lateral → medial)</h4>
+<span class="pill">N. Femoral</span><span class="pill">A. Femoral</span><span class="pill">V. Femoral</span><span class="pill">Canal femoral (linfáticos)</span>
+<div class="alert">Macete: <strong>NAVe</strong> — Nervo · Artéria · Veia (lat → med). O canal femoral é o espaço medial à bainha femoral.</div>`},
+
+{cat:6,src:"UNICH 23.2",b:"b-unc",q:"Nervo obturatório — lesão e comprometimento",a:`
+<h4>Nervo Obturatório (L2-L3-L4)</h4>
+<h4>Comprometimento Motor</h4>
+<ul>
+  <li>Paralisia dos <strong>adutores da coxa</strong>: adutor longo, curto, magno (parte), grácil, obturador externo</li>
+  <li>Fraqueza de adução e rotação medial da coxa</li>
+</ul>
+<h4>Comprometimento Sensitivo</h4>
+Anestesia/hipoestesia na <strong>face medial da coxa</strong> (ramo cutâneo anterior do obturatório).
+<h4>Causas Comuns de Lesão</h4>
+<ul>
+  <li>Cirurgia pélvica (histerectomia, ressecção de próstata)</li>
+  <li>Parto prolongado</li>
+  <li>Hérnia obturatória (sinal de Howship-Romberg: dor face medial da coxa)</li>
+</ul>`},
+
+{cat:6,src:"UNICH 23.2",b:"b-unc",q:"Inervação e vascularização dos compartimentos da perna",a:`
+<h4>Compartimento Anterior</h4>
+Nervo: <strong>Fibular profundo</strong> (L4-L5) | Artéria: <strong>Tibial anterior</strong>
+<h4>Compartimento Lateral</h4>
+Nervo: <strong>Fibular superficial</strong> (L5-S1) | Artéria: ramos da <strong>fibular (peroneira)</strong>
+<h4>Compartimento Posterior Superficial</h4>
+Nervo: <strong>Tibial</strong> (S1-S2) | Artéria: <strong>Tibial posterior</strong> e fibular
+<h4>Compartimento Posterior Profundo</h4>
+Nervo: <strong>Tibial</strong> (L4-S2) | Artéria: <strong>Tibial posterior</strong> e fibular`},
+
+{cat:6,src:"UNICH 24.1",b:"b-unc",q:"Retináculo dos fibulares — conteúdo e limites da fossa poplítea",a:`
+<h4>Retináculo dos Fibulares</h4>
+Espessamentos da fáscia profunda que retêm os tendões dos músculos fibulares longo e curto atrás do maléolo lateral.
+<ul>
+  <li><strong>Retináculo superior</strong>: maléolo lateral → calcâneo (superior)</li>
+  <li><strong>Retináculo inferior</strong>: calcâneo → fáscia do pé (inferior)</li>
+  <li><strong>Conteúdo</strong>: tendões do fibular longo e fibular curto + bainha sinovial</li>
+</ul>
+<h4>Limites da Fossa Poplítea (losango)</h4>
+<table>
+  <tr><th>Limite</th><th>Estrutura</th></tr>
+  <tr><td>Superolateral</td><td>Bíceps femoral</td></tr>
+  <tr><td>Superomedial</td><td>Semitendíneo + semimembranoso</td></tr>
+  <tr><td>Inferolateral</td><td>Cabeça lateral do gastrocnêmio</td></tr>
+  <tr><td>Inferomedial</td><td>Cabeça medial do gastrocnêmio</td></tr>
+  <tr><td>Teto</td><td>Fáscia poplítea</td></tr>
+  <tr><td>Assoalho</td><td>Côndilo femoral + cápsula articular + músculo poplíteo</td></tr>
+</table>
+<h4>Conteúdo</h4>
+A. e V. poplíteas · N. tibial · N. fibular comum · Vasos linfáticos · Gordura`},
+
+{cat:6,src:"UNICH 24.1",b:"b-unc",q:"Artéria tibial posterior — vascularização da perna e ramo principal do pé",a:`
+<h4>Artéria Tibial Posterior</h4>
+Ramo terminal medial da A. poplítea (na abertura do arco do sóleo). Desce no compartimento posterior profundo da perna. Contorna o <strong>maléolo medial</strong> pelo túnel do tarso → divide-se nas <strong>artérias plantares medial e lateral</strong>.
+<h4>Ramos na Perna</h4>
+<ul>
+  <li>A. fibular (peroneira): maior ramo, irriga compartimentos lateral e posterior</li>
+  <li>Ramos musculares para o compartimento posterior</li>
+  <li>A. nutriente da fíbula</li>
+</ul>
+<h4>Ramo Principal do Pé</h4>
+A. plantar lateral (dominant) → forma o <strong>arco plantar profundo</strong> com o ramo plantar profundo da A. dorsal do pé → Aa. metatarsais plantares → Aa. digitais plantares.`},
+
+{cat:6,src:"UNICH 25.1",b:"b-unc",q:"Tuberosidade do 5º metatarso — músculo que se insere, inervação, ação e origem",a:`
+<h4>Músculo Fibular Curto</h4>
+<table>
+  <tr><th></th><th></th></tr>
+  <tr><td><strong>Origem</strong></td><td>Face lateral da fíbula (2/3 inferiores)</td></tr>
+  <tr><td><strong>Inserção</strong></td><td>Tuberosidade da base do 5º metatarso</td></tr>
+  <tr><td><strong>Ação</strong></td><td>Eversão do pé + assistência na flexão plantar</td></tr>
+  <tr><td><strong>Inervação</strong></td><td>N. fibular superficial (L5-S1)</td></tr>
+</table>`},
+
+// ── COLUNA E DORSO ────────────────────────────────────────────
+{cat:7,src:"UFC 24.2",b:"b-ufc",q:"Todos os ligamentos da coluna vertebral",a:`
+<h4>Ligamentos Longitudinais</h4>
+<ul>
+  <li><strong>Lig. longitudinal anterior</strong>: anterior aos corpos vertebrais (atlas ao sacro) — limita extensão</li>
+  <li><strong>Lig. longitudinal posterior</strong>: posterior aos corpos (dentro do canal) — limita flexão</li>
+</ul>
+<h4>Ligamentos do Arco Vertebral</h4>
+<ul>
+  <li><strong>Lig. amarelo (ligamentum flavum)</strong>: une lâminas adjacentes — fibras elásticas, limita flexão</li>
+  <li><strong>Lig. interespinhoso</strong>: entre processos espinhosos adjacentes</li>
+  <li><strong>Lig. supraespinhoso</strong>: une ápices dos processos espinhosos (C7 ao sacro) — na cervical = lig. da nuca</li>
+  <li><strong>Lig. intertransverso</strong>: entre processos transversos</li>
+</ul>
+<h4>Ligamentos das Articulações Zigoapofisárias</h4>
+Cápsulas articulares entre as facetas articulares.
+<h4>Ligamentos Especiais da Coluna Cervical</h4>
+<ul>
+  <li><strong>Lig. transverso do atlas</strong>: mantém o dente do áxis</li>
+  <li><strong>Lig. cruciforme</strong>: transverso + longitudinal (superior e inferior)</li>
+  <li><strong>Lig. alar</strong>: dente do áxis → côndilo occipital</li>
+  <li><strong>Lig. apical do dente</strong>: ápice do dente → clivo do occipital</li>
+  <li><strong>Membrana tectorial</strong>: continuação do lig. longitudinal posterior</li>
+  <li><strong>Membrana atlantooccipital anterior e posterior</strong></li>
+</ul>`},
+
+{cat:7,src:"UFC 2015",b:"b-ufc",q:"Todos os ligamentos da coluna vertebral",a:`
+<h4>Ligamentos Principais</h4>
+<strong>Longitudinais:</strong> Lig. longitudinal anterior (limita extensão) + Lig. longitudinal posterior (limita flexão)
+<strong>Entre arcos:</strong> Lig. amarelo (flavum) + Lig. interespinhoso + Lig. supraespinhoso + Lig. intertransverso
+<h4>Ligamentos Cervicais Especiais (C0-C2)</h4>
+Lig. transverso do atlas · Lig. alar (par) · Lig. apical do dente · Membrana tectorial · Membranas atlantooccipitais anterior e posterior · Lig. da nuca (supraespinhoso cervical expandido)
+<div class="alert">Lig. flavum: único com predomínio de fibras elásticas. Hipertrofia do lig. flavum → estenose do canal raquidiano.</div>`},
+
+{cat:7,src:"UNICH 23.2",b:"b-unc",q:"Ligamentos entre as vértebras",a:`
+<h4>Ligamentos Intervertebrais</h4>
+<table>
+  <tr><th>Ligamento</th><th>Localização</th><th>Função</th></tr>
+  <tr><td>Lig. longitudinal anterior</td><td>Face anterior dos corpos vertebrais</td><td>Limita extensão</td></tr>
+  <tr><td>Lig. longitudinal posterior</td><td>Face posterior dos corpos (canal vertebral)</td><td>Limita flexão, suporta disco</td></tr>
+  <tr><td>Lig. amarelo</td><td>Entre lâminas adjacentes</td><td>Limita flexão, fecha canal</td></tr>
+  <tr><td>Lig. interespinhoso</td><td>Entre processos espinhosos</td><td>Limita flexão</td></tr>
+  <tr><td>Lig. supraespinhoso</td><td>Sobre ápices dos espinhosos</td><td>Limita flexão</td></tr>
+  <tr><td>Lig. intertransverso</td><td>Entre processos transversos</td><td>Limita flexão lateral</td></tr>
+  <tr><td>Disco intervertebral</td><td>Entre corpos vertebrais</td><td>Absorção de choque, mobilidade</td></tr>
+</table>`},
+];
+
+const tabsEl = document.getElementById('tabs');
+const panelsEl = document.getElementById('panels');
+
+CATS.forEach((cat, ci) => {
+  const items = QS.filter(q => q.cat === ci);
+  const tab = document.createElement('button');
+  tab.className = 'tab' + (ci===0?' active':'');
+  tab.innerHTML = cat + '<span class="cnt">(' + items.length + ')</span>';
+  tab.dataset.ci = ci;
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('p' + ci).classList.add('active');
+  };
+  tabsEl.appendChild(tab);
+
+  const panel = document.createElement('div');
+  panel.className = 'panel' + (ci===0?' active':'');
+  panel.id = 'p' + ci;
+
+  const header = document.createElement('div');
+  header.className = 'section-title';
+  header.innerHTML = '<span>' + items.length + ' questões</span><span class="expand-all" onclick="expandAll('+ci+')">Expandir todas</span>';
+  panel.appendChild(header);
+
+  items.forEach((item, ji) => {
+    const gid = 'c' + ci + 'q' + ji;
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.dataset.q = (item.q + ' ' + item.a).toLowerCase();
+    card.innerHTML =
+      '<div class="q-header" onclick="toggle(\'' + gid + '\')">' +
+        '<span class="badge ' + item.b + '">' + item.src + '</span>' +
+        '<span class="q-title">' + item.q + '</span>' +
+        '<span class="q-arrow" id="ar_' + gid + '">▼</span>' +
+      '</div>' +
+      '<div class="q-body" id="b_' + gid + '">' + item.a + '</div>';
+    panel.appendChild(card);
+  });
+  panelsEl.appendChild(panel);
+});
+
+window.toggle = function(gid) {
+  const body = document.getElementById('b_' + gid);
+  const arrow = document.getElementById('ar_' + gid);
+  const card = body.closest('.q-card');
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  arrow.style.transform = open ? '' : 'rotate(180deg)';
+  card.classList.toggle('open', !open);
+};
+
+window.expandAll = function(ci) {
+  const panel = document.getElementById('p' + ci);
+  panel.querySelectorAll('.q-body').forEach(b => b.style.display = 'block');
+  panel.querySelectorAll('.q-arrow').forEach(a => a.style.transform = 'rotate(180deg)');
+  panel.querySelectorAll('.q-card').forEach(c => c.classList.add('open'));
+};
+
+window.filterSearch = function() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.q-card').forEach(c => c.style.display = '');
+    return;
+  }
+  // Show all panels and search across all
+  document.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.q-card').forEach(c => {
+    c.style.display = c.dataset.q.includes(q) ? '' : 'none';
+  });
+};
+</script>
+</body>
+</html>
