@@ -122,6 +122,7 @@
   .badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; font-weight: 600; }
   .b-unc { background: var(--unc-bg); color: var(--unc-c); }
   .b-ufc { background: var(--ufc-bg); color: var(--ufc-c); }
+  .b-zip { background: #efe4ff; color: #5b3a87; }
   .q-title { font-size: 14px; font-weight: 600; flex: 1; line-height: 1.5; }
   .q-arrow { font-size: 11px; color: var(--text3); margin-top: 3px; flex-shrink: 0; transition: transform .2s; }
   .q-body {
@@ -207,6 +208,17 @@
   .fc-answer .alert { background: #fff8e1; border-left: 3px solid #f9a825; padding: 7px 10px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: #555; }
   @media (prefers-color-scheme: dark) { .fc-answer .alert { background: #2e2a00; color: #ccc; } }
   .fc-badge { display: inline-flex; align-items: center; gap: 4px; }
+  .fc-media {
+    display: block;
+    width: 100%;
+    max-height: 240px;
+    object-fit: contain;
+    margin-top: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .fc-imported-text { white-space: normal; }
 
   .fc-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
   .fc-btn { padding: 9px 22px; border-radius: 10px; border: 1px solid var(--border2); font-size: 13px; font-weight: 500; cursor: pointer; background: var(--bg); color: var(--text2); transition: all .15s; }
@@ -322,6 +334,8 @@
 
 <button class="fab-top" id="fab-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+  <script src="flashcards_import.js"></script>
+
 <script>
 const CATS = [
   "🧠 Neuroanatomia",
@@ -333,6 +347,8 @@ const CATS = [
   "🦵 Membro Inferior",
   "🦴 Coluna e Dorso"
 ];
+
+const FC_CATS = [...CATS, "📥 Cabeça e Pescoço (ZIP)"];
 
 const QS = [
 // ── NEUROANATOMIA ──────────────────────────────────────────────
@@ -2043,6 +2059,9 @@ Lig. transverso do atlas · Lig. alar (par) · Lig. apical do dente · Membrana 
 </table>`},
 ];
 
+const ALL_FLASHCARDS = [...QS, ...(window.IMPORTED_FLASHCARDS || [])];
+const IMPORTED_IMAGE_BASE = 'flashcards_assets';
+
 const tabsEl = document.getElementById('tabs');
 const panelsEl = document.getElementById('panels');
 let activeCategory = 0;
@@ -2190,9 +2209,37 @@ let fcDeck = [];
 let fcIdx = 0;
 let fcFlipped = false;
 
+function cardKey(item, pool) {
+  if (item.id) return item.id;
+  return item.cat + '_' + pool.indexOf(item);
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function textToHtml(text) {
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function renderImportedSide(item, side) {
+  const text = side === 'front' ? (item.q || '') : (item.a || '');
+  const imageFile = side === 'front' ? item.frontImage : item.backImage;
+  let html = '<div class="fc-imported-text">' + textToHtml(text) + '</div>';
+  if (imageFile) {
+    html += '<img class="fc-media" src="' + IMPORTED_IMAGE_BASE + '/' + imageFile + '" alt="Imagem do flashcard">';
+  }
+  return html;
+}
+
 (function buildFcSelect() {
   const sel = document.getElementById('fc-cat-sel');
-  CATS.forEach((cat, ci) => {
+  FC_CATS.forEach((cat, ci) => {
     const opt = document.createElement('option');
     opt.value = ci;
     opt.textContent = cat;
@@ -2208,10 +2255,10 @@ window.fcInit = function() {
   localStorage.setItem('anato_fc_shuffle', shuffle ? '1' : '0');
   localStorage.setItem('anato_fc_only_wrong', onlyWrong ? '1' : '0');
 
-  let pool = catVal === -1 ? QS : QS.filter(q => q.cat === catVal);
+  let pool = catVal === -1 ? ALL_FLASHCARDS : ALL_FLASHCARDS.filter(q => q.cat === catVal);
   if (onlyWrong) {
     pool = pool.filter(q => {
-      const id = q.cat + '_' + QS.indexOf(q);
+      const id = cardKey(q, ALL_FLASHCARDS);
       return fcResults[id] === 'wrong' || fcResults[id] === 'review';
     });
   }
@@ -2237,8 +2284,11 @@ function fcShowCard() {
   fcFlipped = false;
   const card = document.getElementById('fc-card');
   card.classList.remove('flipped');
-  document.getElementById('fc-q').textContent = item.q;
-  document.getElementById('fc-a').innerHTML = item.a;
+  document.getElementById('fc-q').innerHTML = item.id ? renderImportedSide(item, 'front') : '';
+  document.getElementById('fc-a').innerHTML = item.id ? renderImportedSide(item, 'back') : item.a;
+  if (!item.id) {
+    document.getElementById('fc-q').textContent = item.q;
+  }
   const badge = document.getElementById('fc-badge-back');
   badge.textContent = item.src;
   badge.className = 'badge ' + item.b;
@@ -2260,7 +2310,7 @@ window.fcFlip = function() {
 
 window.fcRate = function(result) {
   const item = fcDeck[fcIdx];
-  const id = item.cat + '_' + QS.indexOf(item);
+  const id = cardKey(item, ALL_FLASHCARDS);
   fcResults[id] = result;
   fcIdx++;
   if (fcIdx >= fcDeck.length) {
@@ -2292,7 +2342,7 @@ function fcShowDone() {
   const total = fcDeck.length;
   let right = 0, wrong = 0, review = 0;
   fcDeck.forEach(item => {
-    const id = item.cat + '_' + QS.indexOf(item);
+    const id = cardKey(item, ALL_FLASHCARDS);
     const r = fcResults[id];
     if (r === 'right') right++;
     else if (r === 'wrong') wrong++;
