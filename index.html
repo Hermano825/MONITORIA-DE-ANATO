@@ -2604,6 +2604,21 @@ function updateAuthStatus(message) {
   if (authStatus) authStatus.textContent = message;
 }
 
+function explainAuthError(rawMessage) {
+  const message = String(rawMessage || 'Erro desconhecido.');
+  const low = message.toLowerCase();
+  if (low.includes('email not confirmed')) {
+    return 'Seu e-mail ainda nao foi confirmado no Supabase. Desative Confirm email (Auth > Providers > Email) ou confirme o e-mail e tente novamente.';
+  }
+  if (low.includes('invalid login credentials')) {
+    return 'Credenciais invalidas. Se for seu primeiro acesso, abra a aba Criar conta e cadastre nome, e-mail e senha.';
+  }
+  if (low.includes('too many requests') || low.includes('rate limit')) {
+    return 'Muitas tentativas em pouco tempo. Aguarde cerca de 1 minuto e tente novamente.';
+  }
+  return message;
+}
+
 function setAuthMode(mode) {
   authMode = mode === 'signup' ? 'signup' : 'signin';
   const isSignup = authMode === 'signup';
@@ -2815,14 +2830,15 @@ async function signInWithPassword() {
     password
   });
   if (error) {
-    updateSyncBadge('warn', 'Nao foi possivel entrar: ' + error.message);
+    const explained = explainAuthError(error.message);
+    updateSyncBadge('warn', 'Nao foi possivel entrar: ' + explained);
     const loginError = (error.message || '').toLowerCase();
     if (loginError.includes('invalid login credentials')) {
       setAuthMode('signup');
       updateAuthStatus('Conta nao encontrada. Voce foi redirecionado para Criar conta.');
       return;
     }
-    updateAuthStatus('Nao foi possivel entrar: ' + error.message);
+    updateAuthStatus('Nao foi possivel entrar: ' + explained);
     return;
   }
   updateSyncBadge('warn', 'Login realizado. Sincronizando progresso...');
@@ -2864,14 +2880,15 @@ async function signUpWithPassword() {
     }
   });
   if (error) {
-    updateSyncBadge('warn', 'Nao foi possivel criar a conta: ' + error.message);
+    const explained = explainAuthError(error.message);
+    updateSyncBadge('warn', 'Nao foi possivel criar a conta: ' + explained);
     const signUpError = (error.message || '').toLowerCase();
     if (signUpError.includes('already registered') || signUpError.includes('already been registered')) {
       setAuthMode('signin');
       updateAuthStatus('Esse e-mail ja possui conta. Voce foi redirecionado para Entrar.');
       return;
     }
-    updateAuthStatus('Nao foi possivel criar a conta: ' + error.message);
+    updateAuthStatus('Nao foi possivel criar a conta: ' + explained);
     return;
   }
 
@@ -3232,6 +3249,13 @@ document.addEventListener('keydown', function(e) {
 window.addEventListener('scroll', function() {
   const fab = document.getElementById('fab-top');
   fab.classList.toggle('show', window.scrollY > 320);
+});
+
+document.getElementById('sync-password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitAuth();
+  }
 });
 
 document.getElementById('sync-email').value = localStorage.getItem(LOCAL_AUTH_EMAIL_KEY) || '';
