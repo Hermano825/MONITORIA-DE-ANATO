@@ -498,7 +498,7 @@
       <div>
         <div class="auth-kicker">Acesso com Supabase</div>
         <h1>Sua monitoria começa aqui.</h1>
-        <p>Entre com seu e-mail para receber um link mágico. Depois do login, o progresso fica salvo na nuvem, sincronizado entre dispositivos e com insights das suas forças e pontos de reforço.</p>
+        <p>Crie sua conta com e-mail e senha para entrar direto. Depois do login, o progresso fica salvo na nuvem, sincronizado entre dispositivos e com insights das suas forças e pontos de reforço.</p>
         <div class="auth-highlights">
           <div class="auth-pill">
             <div class="num">89</div>
@@ -518,16 +518,21 @@
     </section>
     <section class="auth-form">
       <h2>Entrar na plataforma</h2>
-      <p>Digite seu e-mail institucional ou pessoal. Se já existir uma sessão ativa, o conteúdo abre automaticamente.</p>
+      <p>Crie seu acesso com e-mail e senha. Se a conta ja existir, faca login e continue os estudos automaticamente.</p>
       <div>
         <label for="sync-email">E-mail</label>
         <input type="email" id="sync-email" placeholder="voce@exemplo.com" autocomplete="email">
       </div>
+      <div>
+        <label for="sync-password">Senha</label>
+        <input type="password" id="sync-password" placeholder="Minimo de 6 caracteres" autocomplete="current-password">
+      </div>
       <div class="auth-actions">
-        <button class="auth-primary" type="button" onclick="sendMagicLink()">Enviar link de acesso</button>
+        <button class="auth-primary" type="button" onclick="signInWithPassword()">Entrar</button>
+        <button class="auth-secondary" type="button" onclick="signUpWithPassword()">Criar conta</button>
         <button class="auth-secondary" type="button" onclick="signOutSupabase()">Sair</button>
       </div>
-      <div class="auth-status" id="auth-status">Aguardando login. Você receberá um link por e-mail para liberar o acesso.</div>
+      <div class="auth-status" id="auth-status">Aguardando login com e-mail e senha.</div>
       <div class="auth-links">
         <strong>Privacidade:</strong> o progresso fica associado à sua conta Supabase. <a href="#" onclick="document.getElementById('sync-email').focus(); return false;">Selecionar outro e-mail</a>
       </div>
@@ -557,7 +562,7 @@
       </div>
     </div>
     <div class="sync-actions">
-      <button class="ghost-btn" type="button" onclick="sendMagicLink()">Entrar</button>
+      <button class="ghost-btn" type="button" onclick="signOutSupabase()">Trocar conta</button>
       <button class="ghost-btn" type="button" onclick="signOutSupabase()">Sair</button>
     </div>
   </div>
@@ -2582,7 +2587,7 @@ async function refreshSupabaseState() {
     progressCache = loadProgressCache();
     renderProgressInsights();
     updateSyncBadge('offline', 'Faça login para salvar o progresso na nuvem.');
-    updateAuthStatus('Aguardando login. Você receberá um link por e-mail para liberar o acesso.');
+    updateAuthStatus('Aguardando login com e-mail e senha.');
   }
 }
 
@@ -2719,33 +2724,81 @@ function focusStrongest() {
   }
 }
 
-async function sendMagicLink() {
+function getAuthCredentials() {
+  const emailInput = document.getElementById('sync-email');
+  const passwordInput = document.getElementById('sync-password');
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  return { email, password };
+}
+
+async function signInWithPassword() {
   if (!supabaseClient) {
     updateSyncBadge('offline', 'Configure o Supabase para ativar login e sincronização.');
     updateAuthStatus('Configure o Supabase antes de tentar entrar.');
     return;
   }
-  const emailInput = document.getElementById('sync-email');
-  const email = emailInput.value.trim();
+  const { email, password } = getAuthCredentials();
   if (!email) {
-    updateSyncBadge('warn', 'Digite um e-mail válido para receber o link de acesso.');
-    updateAuthStatus('Digite um e-mail válido para receber o link de acesso.');
+    updateSyncBadge('warn', 'Digite um e-mail válido.');
+    updateAuthStatus('Digite um e-mail válido para entrar.');
+    return;
+  }
+  if (!password || password.length < 6) {
+    updateSyncBadge('warn', 'Digite uma senha com pelo menos 6 caracteres.');
+    updateAuthStatus('Digite uma senha com pelo menos 6 caracteres.');
     return;
   }
   localStorage.setItem(LOCAL_AUTH_EMAIL_KEY, email);
-  const { error } = await supabaseClient.auth.signInWithOtp({
+  const { error } = await supabaseClient.auth.signInWithPassword({
     email,
-    options: {
-      emailRedirectTo: window.location.href
-    }
+    password
   });
   if (error) {
-    updateSyncBadge('warn', 'Não foi possível enviar o link: ' + error.message);
-    updateAuthStatus('Não foi possível enviar o link: ' + error.message);
+    updateSyncBadge('warn', 'Nao foi possivel entrar: ' + error.message);
+    updateAuthStatus('Nao foi possivel entrar: ' + error.message);
     return;
   }
-  updateSyncBadge('warn', 'Link de acesso enviado para ' + email + '.');
-  updateAuthStatus('Link enviado para ' + email + '. Verifique sua caixa de entrada para entrar.');
+  updateSyncBadge('warn', 'Login realizado. Sincronizando progresso...');
+  updateAuthStatus('Login realizado com sucesso.');
+}
+
+async function signUpWithPassword() {
+  if (!supabaseClient) {
+    updateSyncBadge('offline', 'Configure o Supabase para ativar login e sincronização.');
+    updateAuthStatus('Configure o Supabase antes de criar a conta.');
+    return;
+  }
+  const { email, password } = getAuthCredentials();
+  if (!email) {
+    updateSyncBadge('warn', 'Digite um e-mail válido.');
+    updateAuthStatus('Digite um e-mail válido para criar a conta.');
+    return;
+  }
+  if (!password || password.length < 6) {
+    updateSyncBadge('warn', 'Digite uma senha com pelo menos 6 caracteres.');
+    updateAuthStatus('A senha precisa ter pelo menos 6 caracteres.');
+    return;
+  }
+  localStorage.setItem(LOCAL_AUTH_EMAIL_KEY, email);
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+  if (error) {
+    updateSyncBadge('warn', 'Nao foi possivel criar a conta: ' + error.message);
+    updateAuthStatus('Nao foi possivel criar a conta: ' + error.message);
+    return;
+  }
+
+  if (data?.session) {
+    updateSyncBadge('warn', 'Conta criada e login realizado. Sincronizando...');
+    updateAuthStatus('Conta criada com sucesso.');
+    return;
+  }
+
+  updateSyncBadge('warn', 'Conta criada. Confirme o e-mail no Supabase se essa opcao estiver ativa.');
+  updateAuthStatus('Conta criada. Se nao entrou automaticamente, desative Confirm email no Supabase Auth > Providers > Email.');
 }
 
 async function signOutSupabase() {
@@ -3098,6 +3151,7 @@ window.addEventListener('scroll', function() {
 });
 
 document.getElementById('sync-email').value = localStorage.getItem(LOCAL_AUTH_EMAIL_KEY) || '';
+document.getElementById('sync-password').value = '';
 renderProgressInsights();
 initSupabase();
 </script>
