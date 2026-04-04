@@ -212,6 +212,15 @@
     letter-spacing: .01em;
   }
   header p { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .user-btn {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 8px;
+    display: none;
+  }
   .search-bar { margin-top: 12px; display: flex; gap: 8px; }
   .search-bar input {
     flex: 1;
@@ -365,9 +374,36 @@
     border-radius: 10px;
     border: 1px solid var(--border2);
     background: var(--bg2);
-    color: var(--text);
-    font-size: 13px;
-    outline: none;
+  }
+
+  .sync-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 199;
+    display: none;
+  }
+  .sync-modal-overlay.show { display: block; }
+
+  @media (max-width: 640px) {
+    .sync-panel.show {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: auto;
+      width: 100%;
+      max-width: 320px;
+      z-index: 200;
+      border-radius: 0;
+      margin-top: 0;
+      transform: translateX(0);
+      transition: transform 0.3s ease-out;
+      box-shadow: -2px 0 12px rgba(0, 0, 0, 0.1);
+      display: grid !important;
+    }
+    .sync-panel:not(.show) {
+      transform: translateX(100%);
+    }
   }
 
   .insights {
@@ -528,6 +564,9 @@
     .auth-form h2 { font-size: 20px; }
     .auth-form p { font-size: 13px; }
     .auth-mode-switch { margin-top: 4px; margin-bottom: 4px; }
+
+    .user-btn { display: block; }
+    .sync-panel { display: none; }
   }
 </style>
 </head>
@@ -587,8 +626,13 @@
   </div>
 </div>
 <header>
-  <h1>📚 Gabarito — Monitoria de Anatomia</h1>
-  <p>UNICHRISTUS &amp; UFC · 2015–2026 · Questões organizadas por tema</p>
+  <div class="header-top">
+    <div>
+      <h1>📚 Gabarito — Monitoria de Anatomia</h1>
+      <p>UNICHRISTUS &amp; UFC · 2015–2026 · Questões organizadas por tema</p>
+    </div>
+    <button class="user-btn" id="user-btn" type="button" onclick="toggleSyncPanel()">👤</button>
+  </div>
   <div class="search-bar">
     <input type="text" id="search" placeholder="Buscar questão ou conteúdo..." oninput="filterSearch()">
     <button class="ghost-btn" type="button" onclick="clearSearch()">Limpar</button>
@@ -601,6 +645,7 @@
     <button class="mode-btn active" id="btn-gabarito" onclick="setMode('gabarito')">📋 Gabarito</button>
     <button class="mode-btn" id="btn-flashcard" onclick="setMode('flashcard')">🃏 Flashcards</button>
   </div>
+  <div class="sync-modal-overlay" id="sync-modal-overlay" onclick="closeSyncPanel()"></div>
   <div class="sync-panel" id="sync-panel">
     <div>
       <div class="sync-head">
@@ -2644,6 +2689,20 @@ function explainAuthError(rawMessage) {
     return 'Muitas tentativas em pouco tempo. Aguarde cerca de 1 minuto e tente novamente.';
   }
   return message;
+}
+
+function toggleSyncPanel() {
+  const syncPanel = document.getElementById('sync-panel');
+  const overlay = document.getElementById('sync-modal-overlay');
+  syncPanel.classList.toggle('show');
+  overlay.classList.toggle('show');
+}
+
+function closeSyncPanel() {
+  const syncPanel = document.getElementById('sync-panel');
+  const overlay = document.getElementById('sync-modal-overlay');
+  syncPanel.classList.remove('show');
+  overlay.classList.remove('show');
 }
 
 function setAuthMode(mode) {
