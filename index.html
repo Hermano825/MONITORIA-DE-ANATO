@@ -120,6 +120,30 @@
   }
   .auth-form h2 { font-size: 26px; color: var(--text); }
   .auth-form p { font-size: 14px; line-height: 1.7; color: var(--text2); }
+  .auth-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    width: fit-content;
+  }
+  .auth-mode-btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 8px 12px;
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .auth-mode-btn.active {
+    background: #3b2f21;
+    color: #fffaf1;
+  }
   .auth-form label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
   .auth-form input {
     width: 100%;
@@ -168,6 +192,7 @@
   .auth-links strong { color: var(--text); }
   .auth-links a { color: #6b4f17; text-decoration: none; }
   .auth-links a:hover { text-decoration: underline; }
+  .hidden { display: none !important; }
 
   header {
     background: color-mix(in srgb, var(--bg2) 86%, #ffffff 14%);
@@ -518,7 +543,15 @@
     </section>
     <section class="auth-form">
       <h2>Entrar na plataforma</h2>
-      <p>Crie seu acesso com e-mail e senha. Se a conta ja existir, faca login e continue os estudos automaticamente.</p>
+      <p id="auth-subtitle">Use seu e-mail e senha para entrar. Se ainda nao tiver conta, abra a aba Criar conta.</p>
+      <div class="auth-mode-switch" role="tablist" aria-label="Modo de autenticacao">
+        <button id="auth-tab-signin" class="auth-mode-btn active" type="button" onclick="setAuthMode('signin')">Entrar</button>
+        <button id="auth-tab-signup" class="auth-mode-btn" type="button" onclick="setAuthMode('signup')">Criar conta</button>
+      </div>
+      <div id="auth-name-wrap" class="hidden">
+        <label for="sync-name">Nome</label>
+        <input type="text" id="sync-name" placeholder="Seu nome completo" autocomplete="name">
+      </div>
       <div>
         <label for="sync-email">E-mail</label>
         <input type="email" id="sync-email" placeholder="voce@exemplo.com" autocomplete="email">
@@ -528,8 +561,7 @@
         <input type="password" id="sync-password" placeholder="Minimo de 6 caracteres" autocomplete="current-password">
       </div>
       <div class="auth-actions">
-        <button class="auth-primary" type="button" onclick="signInWithPassword()">Entrar</button>
-        <button class="auth-secondary" type="button" onclick="signUpWithPassword()">Criar conta</button>
+        <button id="auth-submit-btn" class="auth-primary" type="button" onclick="submitAuth()">Entrar</button>
         <button class="auth-secondary" type="button" onclick="signOutSupabase()">Sair</button>
       </div>
       <div class="auth-status" id="auth-status">Aguardando login com e-mail e senha.</div>
@@ -2380,6 +2412,7 @@ const ZIP_DECK_SLUG = 'cabeça-e-pescoço-zip';
 const LOCAL_PROGRESS_KEY = 'anato_progress_cache_v2';
 const LOCAL_PROGRESS_DIRTY_KEY = 'anato_progress_dirty_v2';
 const LOCAL_AUTH_EMAIL_KEY = 'anato_auth_email';
+const LOCAL_AUTH_NAME_KEY = 'anato_auth_name';
 
 const SUPABASE_CONFIG = window.SUPABASE_CONFIG || {};
 const SUPABASE_AVAILABLE = Boolean(window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey);
@@ -2390,6 +2423,7 @@ let progressCache = loadProgressCache();
 let localProgressDirty = localStorage.getItem(LOCAL_PROGRESS_DIRTY_KEY) === '1';
 let progressSource = SUPABASE_AVAILABLE ? 'cloud' : 'local';
 let pendingLocalSync = false;
+let authMode = 'signin';
 
 const tabsEl = document.getElementById('tabs');
 const panelsEl = document.getElementById('panels');
@@ -2570,6 +2604,30 @@ function updateAuthStatus(message) {
   if (authStatus) authStatus.textContent = message;
 }
 
+function setAuthMode(mode) {
+  authMode = mode === 'signup' ? 'signup' : 'signin';
+  const isSignup = authMode === 'signup';
+  document.getElementById('auth-name-wrap').classList.toggle('hidden', !isSignup);
+  document.getElementById('auth-tab-signin').classList.toggle('active', !isSignup);
+  document.getElementById('auth-tab-signup').classList.toggle('active', isSignup);
+  document.getElementById('auth-submit-btn').textContent = isSignup ? 'Criar conta' : 'Entrar';
+  document.getElementById('sync-password').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+  document.getElementById('auth-subtitle').textContent = isSignup
+    ? 'Preencha nome, e-mail e senha para criar seu acesso e comecar a usar agora.'
+    : 'Use seu e-mail e senha para entrar. Se ainda nao tiver conta, abra a aba Criar conta.';
+  updateAuthStatus(isSignup
+    ? 'Modo cadastro ativo. Informe nome, e-mail e senha.'
+    : 'Modo login ativo. Informe e-mail e senha para entrar.');
+}
+
+function submitAuth() {
+  if (authMode === 'signup') {
+    signUpWithPassword();
+    return;
+  }
+  signInWithPassword();
+}
+
 async function refreshSupabaseState() {
   if (!supabaseReady) return;
   if (supabaseUser) {
@@ -2725,11 +2783,13 @@ function focusStrongest() {
 }
 
 function getAuthCredentials() {
+  const nameInput = document.getElementById('sync-name');
   const emailInput = document.getElementById('sync-email');
   const passwordInput = document.getElementById('sync-password');
+  const fullName = nameInput.value.trim();
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  return { email, password };
+  return { fullName, email, password };
 }
 
 async function signInWithPassword() {
@@ -2756,6 +2816,12 @@ async function signInWithPassword() {
   });
   if (error) {
     updateSyncBadge('warn', 'Nao foi possivel entrar: ' + error.message);
+    const loginError = (error.message || '').toLowerCase();
+    if (loginError.includes('invalid login credentials')) {
+      setAuthMode('signup');
+      updateAuthStatus('Conta nao encontrada. Voce foi redirecionado para Criar conta.');
+      return;
+    }
     updateAuthStatus('Nao foi possivel entrar: ' + error.message);
     return;
   }
@@ -2769,7 +2835,12 @@ async function signUpWithPassword() {
     updateAuthStatus('Configure o Supabase antes de criar a conta.');
     return;
   }
-  const { email, password } = getAuthCredentials();
+  const { fullName, email, password } = getAuthCredentials();
+  if (!fullName) {
+    updateSyncBadge('warn', 'Digite seu nome para criar a conta.');
+    updateAuthStatus('Digite seu nome completo para criar a conta.');
+    return;
+  }
   if (!email) {
     updateSyncBadge('warn', 'Digite um e-mail válido.');
     updateAuthStatus('Digite um e-mail válido para criar a conta.');
@@ -2780,13 +2851,26 @@ async function signUpWithPassword() {
     updateAuthStatus('A senha precisa ter pelo menos 6 caracteres.');
     return;
   }
+  localStorage.setItem(LOCAL_AUTH_NAME_KEY, fullName);
   localStorage.setItem(LOCAL_AUTH_EMAIL_KEY, email);
   const { data, error } = await supabaseClient.auth.signUp({
     email,
-    password
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        name: fullName
+      }
+    }
   });
   if (error) {
     updateSyncBadge('warn', 'Nao foi possivel criar a conta: ' + error.message);
+    const signUpError = (error.message || '').toLowerCase();
+    if (signUpError.includes('already registered') || signUpError.includes('already been registered')) {
+      setAuthMode('signin');
+      updateAuthStatus('Esse e-mail ja possui conta. Voce foi redirecionado para Entrar.');
+      return;
+    }
     updateAuthStatus('Nao foi possivel criar a conta: ' + error.message);
     return;
   }
@@ -3151,7 +3235,9 @@ window.addEventListener('scroll', function() {
 });
 
 document.getElementById('sync-email').value = localStorage.getItem(LOCAL_AUTH_EMAIL_KEY) || '';
+document.getElementById('sync-name').value = localStorage.getItem(LOCAL_AUTH_NAME_KEY) || '';
 document.getElementById('sync-password').value = '';
+setAuthMode('signin');
 renderProgressInsights();
 initSupabase();
 </script>
