@@ -2528,6 +2528,16 @@ function summarizeProgress() {
   return { totals, categoryStats, strongest, weakest };
 }
 
+function isReviewCandidate(item) {
+  const key = cardKey(item, ALL_FLASHCARDS);
+  const entry = progressCache[key];
+  if (!entry) return false;
+  if ((entry.wrongCount || 0) > (entry.rightCount || 0)) return true;
+  if ((entry.reviewCount || 0) > 0) return true;
+  if ((entry.attempts || 0) > 0 && entry.lastResult !== 'right') return true;
+  return false;
+}
+
 function updateSyncBadge(state, message) {
   const badge = document.getElementById('sync-badge');
   const note = document.getElementById('sync-note');
@@ -3102,10 +3112,7 @@ window.fcInit = function() {
 
   let pool = catVal === -1 ? ALL_FLASHCARDS : ALL_FLASHCARDS.filter(q => q.cat === catVal);
   if (onlyWrong) {
-    pool = pool.filter(q => {
-      const id = cardKey(q, ALL_FLASHCARDS);
-      return fcResults[id] === 'wrong' || fcResults[id] === 'review';
-    });
+    pool = pool.filter(isReviewCandidate);
   }
   if (shuffle) {
     pool = [...pool].sort(() => Math.random() - 0.5);
