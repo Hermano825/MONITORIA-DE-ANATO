@@ -176,6 +176,74 @@
   .mode-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border2); font-size: 12px; cursor: pointer; background: var(--bg2); color: var(--text2); transition: all .15s; }
   .mode-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
 
+  .sync-panel {
+    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.55);
+  }
+  .sync-panel.compact { grid-template-columns: 1fr; }
+  .sync-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .sync-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--bg3); color: var(--text2); }
+  .sync-badge.live { background: #e8f5e9; color: #2e7d32; }
+  .sync-badge.warn { background: #fff8e1; color: #a66a00; }
+  .sync-badge.offline { background: #f5f5f5; color: #666; }
+  .sync-note { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .sync-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .sync-actions input {
+    min-width: min(100%, 260px);
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+  }
+
+  .insights {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .insight-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--bg2) 84%, white 16%);
+    padding: 12px;
+    box-shadow: var(--shadow);
+  }
+  .insight-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .insight-value { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; }
+  .insight-sub { margin-top: 6px; font-size: 12px; color: var(--text2); line-height: 1.4; }
+  .insight-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .insight-box {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.62);
+    padding: 12px;
+  }
+  .insight-box h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; color: var(--text3); }
+  .insight-list-items { display: grid; gap: 8px; }
+  .insight-row { display: grid; gap: 5px; }
+  .insight-row .topline { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--text2); }
+  .insight-bar { height: 8px; border-radius: 999px; background: var(--bg3); overflow: hidden; }
+  .insight-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #3b2f21, #6b4f17); }
+  .empty-state { color: var(--text3); font-size: 12px; line-height: 1.5; }
+
+  .study-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 12px; }
+
   #fc-view { display: none; padding: 1.5rem; max-width: 720px; margin: 0 auto; }
   .fc-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.2rem; align-items: center; }
   .fc-controls select { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg); color: var(--text); font-size: 12px; outline: none; }
@@ -275,6 +343,11 @@
     .q-title { font-size: 13px; }
     .q-body { padding: 12px; }
     .ghost-btn { padding: 0 10px; }
+    .sync-panel { grid-template-columns: 1fr; }
+    .sync-actions { justify-content: stretch; }
+    .sync-actions input { min-width: 0; width: 100%; }
+    .insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .insight-list { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -294,12 +367,65 @@
     <button class="mode-btn active" id="btn-gabarito" onclick="setMode('gabarito')">📋 Gabarito</button>
     <button class="mode-btn" id="btn-flashcard" onclick="setMode('flashcard')">🃏 Flashcards</button>
   </div>
+  <div class="sync-panel" id="sync-panel">
+    <div>
+      <div class="sync-head">
+        <span class="sync-badge offline" id="sync-badge">Offline</span>
+        <span class="sync-note" id="sync-note">Seu progresso fica salvo localmente até conectar o Supabase.</span>
+      </div>
+    </div>
+    <div class="sync-actions">
+      <input type="email" id="sync-email" placeholder="Seu e-mail para login via link" autocomplete="email">
+      <button class="ghost-btn" type="button" onclick="sendMagicLink()">Entrar</button>
+      <button class="ghost-btn" type="button" onclick="signOutSupabase()">Sair</button>
+    </div>
+  </div>
 </header>
 
 <div class="tabs" id="tabs"></div>
 <div id="panels"></div>
 
 <div id="fc-view">
+  <div class="insights" id="study-insights">
+    <div class="insight-card">
+      <div class="insight-label">Estudados</div>
+      <div class="insight-value" id="insight-studied">0</div>
+      <div class="insight-sub" id="insight-studied-sub">Cartões com progresso salvo</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">Aproveitamento</div>
+      <div class="insight-value" id="insight-accuracy">0%</div>
+      <div class="insight-sub" id="insight-accuracy-sub">Acertos acumulados no seu histórico</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">Fortes</div>
+      <div class="insight-value" id="insight-strong">-</div>
+      <div class="insight-sub" id="insight-strong-sub">Categoria com melhor taxa de acerto</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">Reforço</div>
+      <div class="insight-value" id="insight-weak">-</div>
+      <div class="insight-sub" id="insight-weak-sub">Categoria com mais erro/revisão</div>
+    </div>
+  </div>
+
+  <div class="insight-list">
+    <div class="insight-box">
+      <h3>Pontos mais fortes</h3>
+      <div class="insight-list-items" id="strong-list"></div>
+    </div>
+    <div class="insight-box">
+      <h3>Precisa revisar</h3>
+      <div class="insight-list-items" id="weak-list"></div>
+    </div>
+  </div>
+
+  <div class="study-actions">
+    <button class="ghost-btn" type="button" onclick="loadStudyProfile()">Atualizar progresso</button>
+    <button class="ghost-btn" type="button" onclick="focusWeakest()">Estudar pontos fracos</button>
+    <button class="ghost-btn" type="button" onclick="focusStrongest()">Revisar pontos fortes</button>
+  </div>
+
   <div class="fc-controls">
     <select id="fc-cat-sel" onchange="fcInit()">
       <option value="-1">Todas as categorias</option>
@@ -334,6 +460,8 @@
 
 <button class="fab-top" id="fab-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="flashcards_import.js"></script>
 
 <script>
@@ -2061,10 +2189,371 @@ Lig. transverso do atlas · Lig. alar (par) · Lig. apical do dente · Membrana 
 
 const ALL_FLASHCARDS = [...QS, ...(window.IMPORTED_FLASHCARDS || [])];
 const IMPORTED_IMAGE_BASE = 'flashcards_assets';
+const MAIN_DECK_SLUG = 'monitoria-anatomia';
+const ZIP_DECK_SLUG = 'cabeça-e-pescoço-zip';
+const LOCAL_PROGRESS_KEY = 'anato_progress_cache_v2';
+const LOCAL_PROGRESS_DIRTY_KEY = 'anato_progress_dirty_v2';
+const LOCAL_AUTH_EMAIL_KEY = 'anato_auth_email';
+
+const SUPABASE_CONFIG = window.SUPABASE_CONFIG || {};
+const SUPABASE_AVAILABLE = Boolean(window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey);
+let supabaseClient = null;
+let supabaseUser = null;
+let supabaseReady = false;
+let progressCache = loadProgressCache();
+let localProgressDirty = localStorage.getItem(LOCAL_PROGRESS_DIRTY_KEY) === '1';
+let progressSource = SUPABASE_AVAILABLE ? 'cloud' : 'local';
+let pendingLocalSync = false;
 
 const tabsEl = document.getElementById('tabs');
 const panelsEl = document.getElementById('panels');
 let activeCategory = 0;
+
+function getDeckSlug(item) {
+  return item.id ? ZIP_DECK_SLUG : MAIN_DECK_SLUG;
+}
+
+function getCardTitle(item) {
+  return (item.q || '').replace(/\s+/g, ' ').trim();
+}
+
+function getCategoryLabel(item) {
+  return FC_CATS[item.cat] || 'Sem categoria';
+}
+
+function loadProgressCache() {
+  try {
+    const raw = localStorage.getItem(LOCAL_PROGRESS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveProgressCache() {
+  localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(progressCache));
+  localStorage.setItem(LOCAL_PROGRESS_DIRTY_KEY, localProgressDirty ? '1' : '0');
+}
+
+function upsertCacheItem(item, result) {
+  const key = cardKey(item, ALL_FLASHCARDS);
+  const current = progressCache[key] || {
+    deckSlug: getDeckSlug(item),
+    cardKey: key,
+    cardTitle: getCardTitle(item),
+    categoryIndex: item.cat,
+    categoryLabel: getCategoryLabel(item),
+    sourceLabel: item.src,
+    attempts: 0,
+    rightCount: 0,
+    wrongCount: 0,
+    reviewCount: 0,
+    lastResult: null,
+    lastSeenAt: null
+  };
+
+  current.attempts += 1;
+  if (result === 'right') current.rightCount += 1;
+  if (result === 'wrong') current.wrongCount += 1;
+  if (result === 'review') current.reviewCount += 1;
+  current.lastResult = result;
+  current.lastSeenAt = new Date().toISOString();
+  progressCache[key] = current;
+  localProgressDirty = true;
+  saveProgressCache();
+  return current;
+}
+
+function summarizeProgress() {
+  const entries = Object.values(progressCache);
+  const totals = entries.reduce((acc, entry) => {
+    acc.attempts += entry.attempts || 0;
+    acc.right += entry.rightCount || 0;
+    acc.wrong += entry.wrongCount || 0;
+    acc.review += entry.reviewCount || 0;
+    return acc;
+  }, { attempts: 0, right: 0, wrong: 0, review: 0 });
+
+  const byCategory = new Map();
+  entries.forEach(entry => {
+    const bucket = byCategory.get(entry.categoryIndex) || {
+      categoryIndex: entry.categoryIndex,
+      categoryLabel: entry.categoryLabel,
+      attempts: 0,
+      right: 0,
+      wrong: 0,
+      review: 0
+    };
+    bucket.attempts += entry.attempts || 0;
+    bucket.right += entry.rightCount || 0;
+    bucket.wrong += entry.wrongCount || 0;
+    bucket.review += entry.reviewCount || 0;
+    byCategory.set(entry.categoryIndex, bucket);
+  });
+
+  const categoryStats = [...byCategory.values()]
+    .map(item => ({
+      ...item,
+      accuracy: item.attempts ? item.right / item.attempts : 0,
+      pressure: item.attempts ? (item.wrong + item.review) / item.attempts : 0
+    }))
+    .filter(item => item.attempts > 0);
+
+  categoryStats.sort((a, b) => b.accuracy - a.accuracy || b.attempts - a.attempts);
+  const strongest = categoryStats[0] || null;
+  const weakest = [...categoryStats].sort((a, b) => b.pressure - a.pressure || b.attempts - a.attempts)[0] || null;
+
+  return { totals, categoryStats, strongest, weakest };
+}
+
+function updateSyncBadge(state, message) {
+  const badge = document.getElementById('sync-badge');
+  const note = document.getElementById('sync-note');
+  if (!badge || !note) return;
+  badge.className = 'sync-badge ' + state;
+  badge.textContent = state === 'live' ? 'Supabase ativo' : state === 'warn' ? 'Sincronizando' : 'Offline';
+  note.textContent = message;
+}
+
+function renderProgressInsights() {
+  const summary = summarizeProgress();
+  const studied = summary.totals.attempts;
+  const accuracy = studied ? Math.round((summary.totals.right / studied) * 100) : 0;
+  document.getElementById('insight-studied').textContent = studied;
+  document.getElementById('insight-accuracy').textContent = accuracy + '%';
+  document.getElementById('insight-strong').textContent = summary.strongest ? summary.strongest.categoryLabel.replace(/^📥\s*/, '').replace(/^🧠\s*/, '').replace(/^🦷\s*/, '').replace(/^🫁\s*/, '').replace(/^🫃\s*/, '').replace(/^🍑\s*/, '').replace(/^💪\s*/, '').replace(/^🦵\s*/, '').replace(/^🦴\s*/, '') : '-';
+  document.getElementById('insight-weak').textContent = summary.weakest ? summary.weakest.categoryLabel.replace(/^📥\s*/, '').replace(/^🧠\s*/, '').replace(/^🦷\s*/, '').replace(/^🫁\s*/, '').replace(/^🫃\s*/, '').replace(/^🍑\s*/, '').replace(/^💪\s*/, '').replace(/^🦵\s*/, '').replace(/^🦴\s*/, '') : '-';
+
+  const strongList = document.getElementById('strong-list');
+  const weakList = document.getElementById('weak-list');
+  const categoryStats = summary.categoryStats;
+
+  if (!categoryStats.length) {
+    const empty = '<div class="empty-state">Ainda sem progresso suficiente. Resolva alguns flashcards para gerar os pontos fortes e fracos.</div>';
+    strongList.innerHTML = empty;
+    weakList.innerHTML = empty;
+  } else {
+    const strongest = [...categoryStats].sort((a, b) => b.accuracy - a.accuracy || b.attempts - a.attempts).slice(0, 3);
+    const weakest = [...categoryStats].sort((a, b) => b.pressure - a.pressure || b.attempts - a.attempts).slice(0, 3);
+
+    strongList.innerHTML = strongest.map(item => `
+      <div class="insight-row">
+        <div class="topline"><span>${item.categoryLabel}</span><span>${Math.round(item.accuracy * 100)}%</span></div>
+        <div class="insight-bar"><span style="width:${Math.max(8, Math.round(item.accuracy * 100))}%"></span></div>
+      </div>
+    `).join('');
+
+    weakList.innerHTML = weakest.map(item => `
+      <div class="insight-row">
+        <div class="topline"><span>${item.categoryLabel}</span><span>${Math.round(item.pressure * 100)}%</span></div>
+        <div class="insight-bar"><span style="width:${Math.max(8, Math.round(item.pressure * 100))}%"></span></div>
+      </div>
+    `).join('');
+  }
+}
+
+async function initSupabase() {
+  if (!SUPABASE_AVAILABLE) {
+    updateSyncBadge('offline', 'Configure o Supabase para salvar o progresso em nuvem.');
+    renderProgressInsights();
+    return;
+  }
+
+  supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+  const { data } = await supabaseClient.auth.getSession();
+  supabaseUser = data?.session?.user || null;
+  supabaseReady = true;
+  await refreshSupabaseState();
+
+  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    supabaseUser = session?.user || null;
+    await refreshSupabaseState();
+  });
+}
+
+async function refreshSupabaseState() {
+  if (!supabaseReady) return;
+  if (supabaseUser) {
+    updateSyncBadge('warn', 'Conta conectada. Sincronizando progresso...');
+    if (localProgressDirty || pendingLocalSync) {
+      await syncPendingLocalProgress();
+    }
+    await loadStudyProfile();
+    updateSyncBadge('live', 'Seu progresso está salvo no Supabase e disponível em qualquer dispositivo.');
+  } else {
+    progressSource = 'local';
+    progressCache = loadProgressCache();
+    renderProgressInsights();
+    updateSyncBadge('offline', 'Faça login para salvar o progresso na nuvem.');
+  }
+}
+
+async function syncPendingLocalProgress() {
+  if (!supabaseClient || !supabaseUser) return;
+  const entries = Object.values(progressCache);
+  if (!entries.length) return;
+  const payload = entries.map(entry => ({
+    user_id: supabaseUser.id,
+    deck_slug: entry.deckSlug,
+    card_key: entry.cardKey,
+    card_title: entry.cardTitle,
+    category_index: entry.categoryIndex,
+    category_label: entry.categoryLabel,
+    source_label: entry.sourceLabel,
+    attempts: entry.attempts,
+    right_count: entry.rightCount,
+    wrong_count: entry.wrongCount,
+    review_count: entry.reviewCount,
+    last_result: entry.lastResult,
+    last_seen_at: entry.lastSeenAt
+  }));
+
+  const { error } = await supabaseClient.from('flashcard_progress').upsert(payload, {
+    onConflict: 'user_id,deck_slug,card_key'
+  });
+  if (!error) {
+    pendingLocalSync = false;
+    localProgressDirty = false;
+    saveProgressCache();
+  }
+}
+
+async function loadStudyProfile() {
+  if (!supabaseClient || !supabaseUser) {
+    renderProgressInsights();
+    return;
+  }
+
+  if (localProgressDirty || pendingLocalSync) {
+    await syncPendingLocalProgress();
+  }
+
+  const { data, error } = await supabaseClient
+    .from('flashcard_progress')
+    .select('deck_slug,card_key,card_title,category_index,category_label,source_label,attempts,right_count,wrong_count,review_count,last_result,last_seen_at')
+    .eq('user_id', supabaseUser.id)
+    .order('last_seen_at', { ascending: false });
+
+  if (error) {
+    updateSyncBadge('warn', 'Não foi possível ler o progresso agora.');
+    return;
+  }
+
+  const nextCache = {};
+  data.forEach(row => {
+    nextCache[row.card_key] = {
+      deckSlug: row.deck_slug,
+      cardKey: row.card_key,
+      cardTitle: row.card_title,
+      categoryIndex: row.category_index,
+      categoryLabel: row.category_label,
+      sourceLabel: row.source_label,
+      attempts: row.attempts || 0,
+      rightCount: row.right_count || 0,
+      wrongCount: row.wrong_count || 0,
+      reviewCount: row.review_count || 0,
+      lastResult: row.last_result,
+      lastSeenAt: row.last_seen_at
+    };
+  });
+
+  progressSource = 'cloud';
+  progressCache = nextCache;
+  saveProgressCache();
+  renderProgressInsights();
+}
+
+async function recordAttempt(item, result) {
+  const updated = upsertCacheItem(item, result);
+  pendingLocalSync = true;
+  renderProgressInsights();
+
+  if (!supabaseClient || !supabaseUser) return;
+
+  const payload = {
+    user_id: supabaseUser.id,
+    deck_slug: updated.deckSlug,
+    card_key: updated.cardKey,
+    card_title: updated.cardTitle,
+    category_index: updated.categoryIndex,
+    category_label: updated.categoryLabel,
+    source_label: updated.sourceLabel,
+    attempts: updated.attempts,
+    right_count: updated.rightCount,
+    wrong_count: updated.wrongCount,
+    review_count: updated.reviewCount,
+    last_result: updated.lastResult,
+    last_seen_at: updated.lastSeenAt
+  };
+
+  const { error } = await supabaseClient.from('flashcard_progress').upsert(payload, {
+    onConflict: 'user_id,deck_slug,card_key'
+  });
+  if (!error) pendingLocalSync = false;
+}
+
+function focusCategoryByIndex(index) {
+  const tab = document.querySelector('.tab[data-ci="' + index + '"]');
+  if (tab) tab.click();
+}
+
+function focusWeakest() {
+  const summary = summarizeProgress();
+  if (summary.weakest) {
+    setMode('flashcard');
+    document.getElementById('fc-cat-sel').value = String(summary.weakest.categoryIndex);
+    document.getElementById('fc-only-wrong').checked = true;
+    fcInit();
+  } else {
+    setMode('flashcard');
+  }
+}
+
+function focusStrongest() {
+  const summary = summarizeProgress();
+  if (summary.strongest) {
+    setMode('flashcard');
+    document.getElementById('fc-cat-sel').value = String(summary.strongest.categoryIndex);
+    document.getElementById('fc-only-wrong').checked = false;
+    fcInit();
+  } else {
+    setMode('flashcard');
+  }
+}
+
+async function sendMagicLink() {
+  if (!supabaseClient) {
+    updateSyncBadge('offline', 'Configure o Supabase para ativar login e sincronização.');
+    return;
+  }
+  const email = document.getElementById('sync-email').value.trim();
+  if (!email) {
+    updateSyncBadge('warn', 'Digite um e-mail válido para receber o link de acesso.');
+    return;
+  }
+  localStorage.setItem(LOCAL_AUTH_EMAIL_KEY, email);
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.href
+    }
+  });
+  if (error) {
+    updateSyncBadge('warn', 'Não foi possível enviar o link: ' + error.message);
+    return;
+  }
+  updateSyncBadge('warn', 'Link de acesso enviado para ' + email + '.');
+}
+
+async function signOutSupabase() {
+  if (!supabaseClient) {
+    updateSyncBadge('offline', 'Sem Supabase configurado.');
+    return;
+  }
+  await supabaseClient.auth.signOut();
+}
 
 CATS.forEach((cat, ci) => {
   const items = QS.filter(q => q.cat === ci);
@@ -2312,6 +2801,7 @@ window.fcRate = function(result) {
   const item = fcDeck[fcIdx];
   const id = cardKey(item, ALL_FLASHCARDS);
   fcResults[id] = result;
+  recordAttempt(item, result);
   fcIdx++;
   if (fcIdx >= fcDeck.length) {
     fcShowDone();
@@ -2404,6 +2894,10 @@ window.addEventListener('scroll', function() {
   const fab = document.getElementById('fab-top');
   fab.classList.toggle('show', window.scrollY > 320);
 });
+
+document.getElementById('sync-email').value = localStorage.getItem(LOCAL_AUTH_EMAIL_KEY) || '';
+renderProgressInsights();
+initSupabase();
 </script>
 </body>
 </html>
