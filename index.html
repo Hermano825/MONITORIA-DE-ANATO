@@ -169,8 +169,10 @@
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
+    transition: all .2s ease;
   }
   .auth-primary:hover { opacity: .92; }
+  .auth-primary:active { transform: scale(0.97); }
   .auth-secondary {
     border: 1px solid var(--border2);
     border-radius: 12px;
@@ -180,8 +182,10 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    transition: all .2s ease;
   }
   .auth-secondary:hover { color: var(--text); }
+  .auth-secondary:active { transform: scale(0.97); }
   .auth-status {
     padding: 12px 14px;
     border-radius: 12px;
@@ -245,6 +249,7 @@
     transition: all .15s;
   }
   .ghost-btn:hover { color: var(--text); background: #fff8ea; }
+  .ghost-btn:active { transform: scale(0.96); opacity: 0.85; }
   .search-meta {
     margin-top: 8px;
     display: flex;
@@ -264,6 +269,20 @@
     top: 92px;
     z-index: 90;
   }
+  .progress-bar-mobile {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b2f21 0%, #6b4f17 100%);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    z-index: 95;
+  }
+  .progress-bar-mobile.show { display: block; }
   .tab {
     padding: 6px 14px;
     border-radius: 999px;
@@ -292,6 +311,7 @@
   }
   .q-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; }
   .q-header:hover { background: #fff6e8; }
+  .q-header:active { transform: scale(0.99); }
   .badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; font-weight: 600; }
   .b-unc { background: var(--unc-bg); color: var(--unc-c); }
   .b-ufc { background: var(--ufc-bg); color: var(--ufc-c); }
@@ -348,6 +368,7 @@
   .mode-toggle { display: flex; gap: 6px; margin-top: 10px; }
   .mode-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border2); font-size: 12px; cursor: pointer; background: var(--bg2); color: var(--text2); transition: all .15s; }
   .mode-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .mode-btn:active { transform: scale(0.95); }
 
   .sync-panel {
     margin-top: 12px;
@@ -451,8 +472,9 @@
   .fc-stats { margin-left: auto; font-size: 12px; color: var(--text3); }
   .fc-stats span { font-weight: 600; color: var(--text); }
 
-  .fc-card-wrap { perspective: 1200px; width: 100%; height: min(72vh, 560px); min-height: 340px; margin-bottom: 1.2rem; cursor: pointer; }
+  .fc-card-wrap { perspective: 1200px; width: 100%; height: min(72vh, 560px); min-height: 340px; margin-bottom: 1.2rem; cursor: pointer; user-select: none; }
   .fc-card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.4,0,.2,1); }
+  .fc-card:active { transform: scale(0.98); }
   .fc-card.flipped { transform: rotateY(180deg); }
   .fc-front, .fc-back {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -661,6 +683,7 @@
 </header>
 
 <div class="tabs" id="tabs"></div>
+<div class="progress-bar-mobile" id="progress-bar-mobile"></div>
 <div id="panels"></div>
 
 <div id="fc-view">
@@ -3115,11 +3138,13 @@ window.setMode = function(mode) {
   const searchBar = document.querySelector('.search-bar');
   const btnG = document.getElementById('btn-gabarito');
   const btnF = document.getElementById('btn-flashcard');
+  const progressBar = document.getElementById('progress-bar-mobile');
   if (mode === 'flashcard') {
     gabEl.style.display = 'none';
     tabsEl2.style.display = 'none';
     searchBar.style.display = 'none';
     fcEl.style.display = 'block';
+    progressBar.classList.add('show');
     btnG.classList.remove('active');
     btnF.classList.add('active');
     localStorage.setItem('anato_mode', 'flashcard');
@@ -3129,11 +3154,21 @@ window.setMode = function(mode) {
     tabsEl2.style.display = '';
     searchBar.style.display = '';
     fcEl.style.display = 'none';
+    progressBar.classList.remove('show');
     btnG.classList.add('active');
     btnF.classList.remove('active');
     localStorage.setItem('anato_mode', 'gabarito');
   }
 };
+
+function updateProgressBar() {
+  if (fcDeck.length === 0) return;
+  const progress = (fcIdx + 1) / fcDeck.length;
+  const bar = document.getElementById('progress-bar-mobile');
+  if (bar && bar.classList.contains('show')) {
+    bar.style.transform = `scaleX(${progress})`;
+  }
+}
 
 const fcResults = {};
 let fcDeck = [];
@@ -3227,6 +3262,8 @@ function fcShowCard() {
   document.getElementById('fc-prog').style.width = pct + '%';
   document.getElementById('fc-counter').innerHTML =
     '<strong>' + (fcIdx + 1) + '</strong> de <strong>' + total + '</strong>';
+  
+  updateProgressBar();
 }
 
 window.fcFlip = function() {
@@ -3242,6 +3279,7 @@ window.fcRate = function(result) {
   fcResults[id] = result;
   recordAttempt(item, result);
   fcIdx++;
+  updateProgressBar();
   if (fcIdx >= fcDeck.length) {
     fcShowDone();
   } else {
@@ -3297,6 +3335,30 @@ function fcShowDone() {
       '<button class="fc-restart" onclick="document.getElementById(\'fc-only-wrong\').checked=false;fcInit()">Reiniciar baralho</button>' +
     '</div>';
 }
+
+(function setupSwipeGestures() {
+  let touchStartX = 0;
+  let touchEndX = 0;
+  function handleSwipe() {
+    const minSwipeDistance = 50;
+    const distance = touchStartX - touchEndX;
+    if (Math.abs(distance) < minSwipeDistance) return;
+    if (document.getElementById('fc-view').style.display === 'none') return;
+    if (!fcFlipped) return;
+    if (distance > 0) {
+      fcRate('right');
+    } else {
+      fcRate('wrong');
+    }
+  }
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, false);
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, false);
+})();
 
 document.addEventListener('keydown', function(e) {
   if (document.getElementById('fc-view').style.display === 'none') return;
