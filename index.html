@@ -764,6 +764,7 @@
 <script src="supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="flashcards_import.js"></script>
+  <script src="flashcards_cabeca_import.js"></script>
   <script src="flashcards_neuro_import.js"></script>
 
 <script>
@@ -778,7 +779,7 @@ const CATS = [
   "🦴 Coluna e Dorso"
 ];
 
-const FC_CATS = [...CATS, "📥 Cabeça e Pescoço (ZIP)", "📥 Neuro - Monitoria", "📥 Neuro - Prova normal"];
+const FC_CATS = [...CATS, "📥 Cabeça e Pescoço (ZIP)", "📥 Neuro - Monitoria", "📥 Neuro - Prova normal", "📥 Cabeça e Pescoço - Monitoria", "📥 Cabeça e Pescoço - Prova normal"];
 
 const QS = [
 // ── NEUROANATOMIA ──────────────────────────────────────────────
@@ -2489,7 +2490,7 @@ Lig. transverso do atlas · Lig. alar (par) · Lig. apical do dente · Membrana 
 </table>`},
 ];
 
-const ALL_FLASHCARDS = [...QS, ...(window.IMPORTED_FLASHCARDS || []), ...(window.NEURO_IMPORTED_FLASHCARDS || [])];
+const ALL_FLASHCARDS = [...QS, ...(window.IMPORTED_FLASHCARDS || []), ...(window.NEURO_IMPORTED_FLASHCARDS || []), ...(window.CABECA_PESCOCO_IMPORTED_FLASHCARDS || [])];
 const IMPORTED_IMAGE_BASE = 'flashcards_assets';
 const MAIN_DECK_SLUG = 'monitoria-anatomia';
 const ZIP_DECK_SLUG = 'cabeça-e-pescoço-zip';
