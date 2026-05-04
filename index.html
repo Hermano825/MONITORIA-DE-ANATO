@@ -450,6 +450,40 @@
   }
   .sync-modal-overlay.show { display: block; }
 
+  .pull-refresh-indicator {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translate(-50%, -12px) scale(.98);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 180;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(12px);
+    transition: opacity .18s ease, transform .18s ease, background .18s ease, color .18s ease;
+  }
+  .pull-refresh-indicator.show { opacity: 1; }
+  .pull-refresh-indicator.armed {
+    background: rgba(59, 47, 33, 0.96);
+    color: #fffaf1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  .pull-refresh-indicator.refreshing {
+    background: rgba(123, 90, 43, 0.96);
+    color: #fffaf1;
+    transform: translate(-50%, 0) scale(1);
+  }
+
   @media (max-width: 640px) {
     .sync-panel.show {
       position: fixed;
@@ -662,6 +696,7 @@
     .insight-list { grid-template-columns: 1fr; }
     .fc-front, .fc-back { padding: 1.25rem; border-radius: 18px; }
     .fc-card-wrap { min-height: 320px; height: 66vh; }
+    .pull-refresh-indicator { top: 82px; }
   }
 </style>
 </head>
@@ -755,6 +790,8 @@
   </div>
 </header>
 
+<div class="pull-refresh-indicator" id="pull-refresh-indicator" aria-live="polite">↻ Puxe para sincronizar</div>
+
 <div class="tabs" id="tabs"></div>
 <div class="progress-bar-mobile" id="progress-bar-mobile"></div>
 <div id="panels"></div>
@@ -795,7 +832,7 @@
   </div>
 
   <div class="study-actions">
-    <button class="ghost-btn" type="button" onclick="loadStudyProfile()">Atualizar progresso</button>
+    <button class="ghost-btn" type="button" onclick="refreshStudyProfile()">Atualizar progresso</button>
     <button class="ghost-btn" type="button" onclick="focusWeakest()">Estudar pontos fracos</button>
     <button class="ghost-btn" type="button" onclick="focusStrongest()">Revisar pontos fortes</button>
   </div>
@@ -2924,6 +2961,36 @@ async function loadStudyProfile() {
   renderProgressInsights();
 }
 
+let refreshInProgress = false;
+
+async function refreshStudyProfile() {
+  if (refreshInProgress) return;
+  refreshInProgress = true;
+  const indicator = document.getElementById('pull-refresh-indicator');
+  if (indicator) {
+    indicator.textContent = '↻ Sincronizando...';
+    indicator.className = 'pull-refresh-indicator show refreshing';
+  }
+  updateSyncBadge('warn', 'Sincronizando progresso...');
+
+  try {
+    await loadStudyProfile();
+    if (supabaseClient && supabaseUser) {
+      updateSyncBadge('live', 'Progresso sincronizado.');
+    }
+    if (indicator) {
+      indicator.textContent = '✓ Sincronizado';
+      indicator.className = 'pull-refresh-indicator show';
+      setTimeout(() => {
+        indicator.className = 'pull-refresh-indicator';
+        indicator.textContent = '↻ Puxe para sincronizar';
+      }, 900);
+    }
+  } finally {
+    refreshInProgress = false;
+  }
+}
+
 async function recordAttempt(item, result) {
   const updated = upsertCacheItem(item, result);
   pendingLocalSync = true;
@@ -3434,6 +3501,73 @@ function fcShowDone() {
     touchEndX = e.changedTouches[0].screenX;
     handleSwipe();
   }, false);
+})();
+
+(function setupPullToRefresh() {
+  let touchStartY = 0;
+  let touchCurrentY = 0;
+  let pullActive = false;
+  let pullArmed = false;
+  const threshold = 78;
+  const indicator = document.getElementById('pull-refresh-indicator');
+
+  function resetIndicator() {
+    pullActive = false;
+    pullArmed = false;
+    if (!indicator) return;
+    indicator.className = 'pull-refresh-indicator';
+    indicator.textContent = '↻ Puxe para sincronizar';
+    indicator.style.transform = 'translate(-50%, -12px) scale(.98)';
+  }
+
+  function updateIndicator(distance) {
+    if (!indicator) return;
+    const clamped = Math.min(120, Math.max(0, distance));
+    const progress = Math.min(1, clamped / threshold);
+    indicator.classList.add('show');
+    indicator.style.transform = 'translate(-50%, ' + Math.min(0, clamped / 2 - 12) + 'px) scale(' + (0.98 + progress * 0.04) + ')';
+    if (clamped >= threshold) {
+      pullArmed = true;
+      indicator.classList.add('armed');
+      indicator.textContent = '↻ Solte para sincronizar';
+    } else {
+      pullArmed = false;
+      indicator.classList.remove('armed');
+      indicator.textContent = '↻ Puxe para sincronizar';
+    }
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (window.innerWidth > 640) return;
+    if (refreshInProgress) return;
+    if (window.scrollY > 2) return;
+    if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+    touchStartY = e.touches[0].clientY;
+    touchCurrentY = touchStartY;
+    pullActive = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!pullActive || refreshInProgress) return;
+    touchCurrentY = e.touches[0].clientY;
+    const distance = touchCurrentY - touchStartY;
+    if (distance <= 0) {
+      resetIndicator();
+      return;
+    }
+    e.preventDefault();
+    updateIndicator(distance);
+  }, { passive: false });
+
+  document.addEventListener('touchend', async () => {
+    if (!pullActive) return;
+    const distance = touchCurrentY - touchStartY;
+    const shouldRefresh = pullArmed || distance >= threshold;
+    if (shouldRefresh) {
+      await refreshStudyProfile();
+    }
+    resetIndicator();
+  }, { passive: true });
 })();
 
 document.addEventListener('keydown', function(e) {
