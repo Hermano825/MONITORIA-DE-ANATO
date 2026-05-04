@@ -3496,6 +3496,10 @@ function fcShowDone() {
   }
   document.addEventListener('touchstart', e => {
     touchStartX = e.changedTouches[0].screenX;
+    const touchTarget = e.target;
+    if (touchTarget.closest('.fc-back, .fc-answer, .fc-media, .fc-actions')) {
+      touchStartX = 0;
+    }
   }, false);
   document.addEventListener('touchend', e => {
     touchEndX = e.changedTouches[0].screenX;
