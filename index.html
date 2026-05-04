@@ -2678,6 +2678,12 @@ function upsertCacheItem(item, result) {
   if (result === 'review') current.reviewCount += 1;
   current.lastResult = result;
   current.lastSeenAt = new Date().toISOString();
+  // If the user finally got the card right, remove it from "wrong/review" buckets
+  // so it no longer appears in the "Repetir erradas/revisar" filter.
+  if (result === 'right') {
+    current.wrongCount = 0;
+    current.reviewCount = 0;
+  }
   progressCache[key] = current;
   localProgressDirty = true;
   saveProgressCache();
