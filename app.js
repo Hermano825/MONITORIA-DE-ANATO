@@ -16,7 +16,10 @@ const XLSX_BLOB_PATH = 'monitoria-dados.xlsx';
 const SECRET_LOCAL_PATH = path.join(DATA_DIR, 'segredo.txt');
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 90; // 90 dias
 
-const USANDO_BLOB = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+// Na Vercel, o Blob conectado ao projeto expõe BLOB_STORE_ID (auth via OIDC)
+// ou BLOB_READ_WRITE_TOKEN (token classico). O SDK detecta os dois sozinho.
+const USANDO_BLOB = Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+const SECRET_BLOB_PATH = 'segredo-sessao.txt';
 
 const USERS_SHEET = 'Usuarios';
 const USERS_HEADERS = ['Nome', 'Email', 'SenhaHash', 'Sal', 'Aba', 'CriadoEm', 'UltimoAcesso'];
@@ -255,24 +258,59 @@ function withWorkbook(mutates, task) {
 // ---------------------------------------------------------------------------
 
 let cachedSecret = null;
-function getSecret() {
+
+async function lerSegredoDoBlob() {
+  const { get } = require('@vercel/blob');
+  const result = await get(SECRET_BLOB_PATH, { access: 'private', useCache: false });
+  if (result && result.statusCode === 200) {
+    return (await new Response(result.stream).text()).trim();
+  }
+  return null;
+}
+
+// Garante o segredo usado para assinar os tokens de sessao. Na nuvem ele fica
+// guardado no proprio Blob (segredo-sessao.txt); localmente em dados/segredo.txt.
+async function ensureSecret() {
   if (cachedSecret) return cachedSecret;
   if (process.env.SESSION_SECRET) {
     cachedSecret = process.env.SESSION_SECRET;
-  } else if (process.env.BLOB_READ_WRITE_TOKEN) {
-    // Deriva um segredo estavel a partir do token do Blob (ja e secreto e exclusivo do projeto).
-    cachedSecret = crypto.createHash('sha256')
-      .update('monitoria-anato:' + process.env.BLOB_READ_WRITE_TOKEN)
-      .digest('hex');
-  } else {
-    try {
-      cachedSecret = fs.readFileSync(SECRET_LOCAL_PATH, 'utf8').trim();
-    } catch {
-      cachedSecret = crypto.randomBytes(32).toString('hex');
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-      fs.writeFileSync(SECRET_LOCAL_PATH, cachedSecret, 'utf8');
-    }
+    return cachedSecret;
   }
+  if (USANDO_BLOB) {
+    const existente = await lerSegredoDoBlob();
+    if (existente) {
+      cachedSecret = existente;
+      return cachedSecret;
+    }
+    const novo = crypto.randomBytes(32).toString('hex');
+    try {
+      const { put } = require('@vercel/blob');
+      await put(SECRET_BLOB_PATH, novo, {
+        access: 'private',
+        addRandomSuffix: false,
+        contentType: 'text/plain'
+      });
+      cachedSecret = novo;
+    } catch {
+      // Outra instancia pode ter criado o segredo ao mesmo tempo: usa o que ficou salvo.
+      const salvo = await lerSegredoDoBlob();
+      if (!salvo) throw new Error('Nao foi possivel preparar o segredo de sessao no storage.');
+      cachedSecret = salvo;
+    }
+    return cachedSecret;
+  }
+  try {
+    cachedSecret = fs.readFileSync(SECRET_LOCAL_PATH, 'utf8').trim();
+  } catch {
+    cachedSecret = crypto.randomBytes(32).toString('hex');
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(SECRET_LOCAL_PATH, cachedSecret, 'utf8');
+  }
+  return cachedSecret;
+}
+
+function getSecret() {
+  if (!cachedSecret) throw new Error('Segredo de sessao ainda nao carregado.');
   return cachedSecret;
 }
 
@@ -319,6 +357,16 @@ app.use(express.json({ limit: '2mb' }));
 function apiError(res, statusCode, message) {
   res.status(statusCode).json({ erro: message });
 }
+
+// Carrega o segredo de sessao antes de qualquer rota da API.
+app.use('/api', async (_req, res, next) => {
+  try {
+    await ensureSecret();
+    next();
+  } catch (err) {
+    apiError(res, 500, err.message || 'Nao foi possivel preparar o servidor.');
+  }
+});
 
 app.post('/api/registrar', async (req, res) => {
   const nome = String(req.body?.nome || '').trim();
